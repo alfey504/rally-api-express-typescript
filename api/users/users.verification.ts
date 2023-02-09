@@ -1,4 +1,3 @@
-import { UserData } from 'user_types'
 import { UserServices } from './users.services'
 
 export class Verify {

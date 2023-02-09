@@ -1,7 +1,6 @@
 import { User } from '../../database/entity/User'
 import { Request, Response } from 'express'
 import { UserServices } from './users.services'
-import { UserData } from 'user_types'
 import { hashSync, genSaltSync, compareSync } from 'bcrypt'
 import { sign } from 'jsonwebtoken'
 import * as dotenv from 'dotenv'

@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import { UserController } from './users.controller'
 import { VerifyToken } from '../../auth_middleware/token_verification'
-import { Request, Response } from 'express'
 
 export const usersRoute = Router()
 export function logUserEndPoints() {
