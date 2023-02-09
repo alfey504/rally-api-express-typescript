@@ -1,70 +1,92 @@
-import { UserData, Verified } from "user_types";
-import { getDataSource } from "../../database/data_source"
-import { User } from "../../database/entity/User"
-import { Equal, Repository } from "typeorm";
+import { getDataSource } from '../../database/data_source'
+import { User } from '../../database/entity/User'
+import { Equal, Repository } from 'typeorm'
 
-export class UserServices{
-
-
-    public addUser =  async (user: User, callback: (error?: any, result?: any) => void) => {
-        try{
-            const rallyDataSource = getDataSource();
-            const rallyRepo = (await rallyDataSource).getRepository(User);
-            const result = rallyRepo.save(user);
-            callback(null, result)
-        }catch(error){
-            callback(error)
-        }
+export class UserServices {
+  public addUser = async (
+    user: User,
+    callback: (error?: any, result?: any) => void
+  ) => {
+    try {
+      const rallyDataSource = getDataSource()
+      const rallyRepo = (await rallyDataSource).getRepository(User)
+      const result = rallyRepo.save(user)
+      callback(null, result)
+    } catch (error) {
+      callback(error)
     }
+  }
 
-    public getUserByUserName = async (userName: String, callback: (error?: any, result?: any) => void) => {
-        try{
-            const rallyDataSource = getDataSource();
-            const rallyRepo = (await rallyDataSource).getRepository(User);
-            console.log(userName)
-            const result = await rallyRepo.findOne({
-                where: {
-                    userName: Equal(userName)
-                },
-            })
-            callback(null, result)
-        }catch(error){
-            callback(error)
+  public getUserByUserName = async (
+    userName: String,
+    callback: (error?: any, result?: any) => void
+  ) => {
+    try {
+      const rallyDataSource = getDataSource()
+      const rallyRepo = (await rallyDataSource).getRepository(User)
+      console.log(userName)
+      const result = await rallyRepo.findOne({
+        where: {
+          userName: Equal(userName)
         }
+      })
+      callback(null, result)
+      return result
+    } catch (error) {
+      callback(error)
+      return null
     }
+  }
 
-    public verifyUser = ((user: UserData): Verified => {
-        if(user.fullName == undefined){
-            return {
-                verified: false,
-                message: "parameter {fullName:} is not given"
-            }
-        }
+  public updateUserName = async (
+    userName: String,
+    userId: number,
+    callback: (error?: any, result?: any) => void
+  ) => {
+    try {
+      const rallyDataSource = getDataSource()
+      const rallyRepo = (await rallyDataSource).getRepository(User)
+      const result = await rallyRepo.update(
+        { id: userId },
+        { userName: userName }
+      )
+      callback(null, result)
+    } catch (error) {
+      callback(error)
+    }
+  }
 
-        if(user.userName == undefined){
-            return {
-                verified: false,
-                message: "parameter {userName:} is not given"
-            }
-        }
+  public updateEmail = async (
+    email: String,
+    userId: number,
+    callback: (error?: any, result?: any) => void
+  ) => {
+    try {
+      const rallyDataSource = getDataSource()
+      const rallyRepo = (await rallyDataSource).getRepository(User)
+      const result = await rallyRepo.update({ id: userId }, { email: email })
+      callback(null, result)
+    } catch (error) {
+      callback(error)
+    }
+  }
 
-        if(user.password == undefined){
-            return {
-                verified: false,
-                message: "parameter {password:} is not given"
-            }
+  public getUserByEmail = async (
+    email: String,
+    callback: (error?: any, result?: any) => void
+  ) => {
+    try {
+      const rallyDataSource = getDataSource()
+      const rallyRepo = (await rallyDataSource).getRepository(User)
+      console.log(email)
+      const result = await rallyRepo.findOne({
+        where: {
+          email: Equal(email)
         }
-
-        if(user.email == undefined){
-            return {
-                verified: false,
-                message: "parameter {email:} is not given"
-            }
-        }
-
-        return {
-            verified: true,
-            message: ""
-        }
-    })
+      })
+      callback(null, result)
+    } catch (error) {
+      callback(error)
+    }
+  }
 }
