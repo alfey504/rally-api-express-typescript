@@ -39,3 +39,7 @@ dist/**/*
 
 # ignore yarn.lock
 yarn.lock
+
+# ignore pretier and eslint config
+.eslintrc
+.prettierrc
