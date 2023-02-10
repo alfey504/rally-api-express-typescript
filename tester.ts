@@ -1,5 +1,5 @@
-import { UserServices } from './api/users/users.services';
+import { UserServices } from './api/users/users.services'
 
-let userServices = new UserServices();
+let userServices = new UserServices()
 
-userServices.getUserByEmail('sudalamani');
+userServices.getUserByEmail('sudalamani')

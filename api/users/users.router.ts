@@ -8,6 +8,7 @@ export function logUserEndPoints() {
     console.log('/login                     METHOD:POST')
     console.log('/username                  METHOD:PUT')
     console.log('/email                     METHOD:PUT')
+    console.log('/password                  METHOD:PUT')
 }
 
 const userController = new UserController()
@@ -25,5 +26,8 @@ usersRoute.put(
     userController.changeUserName
 )
 
-//  change password for userid
+//  change email for userid
 usersRoute.put('/email', VerifyToken.verifyToken, userController.changeEmail)
+
+//  change password for userid
+usersRoute.put('/password', VerifyToken.verifyToken, userController.changePassword)

@@ -12,7 +12,7 @@ export class Verify {
     }
 
     // check if email already exist in the database
-    public doesEmaiExist = async (email: String): Promise<Boolean> => {
+    public doesEmailExist = async (email: String): Promise<Boolean> => {
         let exist: boolean = true
         let callback = (error: any, result: any) => {
             console.log(error)

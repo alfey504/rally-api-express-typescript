@@ -97,4 +97,23 @@ export class UserServices {
             callback(error)
         }
     }
+
+    // updates a users password in the database
+    public updatePassword = async (
+        password: String,
+        userId: number,
+        callback: (error?: any, result?: any) => void
+    ) => {
+        try {
+            const rallyDataSource = getDataSource()
+            const rallyRepo = (await rallyDataSource).getRepository(User)
+            const result = await rallyRepo.update(
+                { id: userId },
+                { password: password }
+            )
+            callback(null, result)
+        } catch (error) {
+            callback(error)
+        }
+    }
 }

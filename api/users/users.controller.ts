@@ -36,7 +36,7 @@ export class UserController {
                 data: [{}]
             })
         } else {
-            if (await this.verify.doesEmaiExist(req.body.email)) {
+            if (await this.verify.doesEmailExist(req.body.email)) {
                 res.sendStatus(200).json({
                     success: Verify.USER_EMAIL_ALREADY_EXISTS,
                     message: 'Email already exists',
@@ -256,50 +256,128 @@ export class UserController {
         let email = req.body.email
         let userId = req.body.id
 
-        if (email != undefined && userId != undefined) {
-            this.userServices.updateEmail(
-                email,
-                userId,
-                (error: any, result: any) => {
-                    if (error) {
-                        console.log(error)
+        if (req.body.email == undefined) {
+            res.sendStatus(401).json({
+                success: 0,
+                message: 'missing parameter {userName:}',
+                data: [{}]
+            })
+        } else {
+            if (await this.verify.doesEmailExist(req.body.email)) {
+                res.sendStatus(200).json({
+                    success: Verify.USER_USERNAME_ALREADY_EXISTS,
+                    message: 'Username already exists',
+                    data: [{}]
+                })
+            }
+        }
+
+        if (req.body.id == undefined) {
+            res.sendStatus(401).json({
+                success: 0,
+                message: 'missing parameter {id:}',
+                data: [{}]
+            })
+        }
+
+        this.userServices.updateEmail(
+            email,
+            userId,
+            (error: any, result: any) => {
+                if (error) {
+                    console.log(error)
+                    let response = {
+                        success: 0,
+                        message: 'DATABASE ERROR: failed to update email',
+                        data: [{}]
+                    }
+                    res.json(response)
+                } else {
+                    if (result.affected == 0) {
+                        console.log(result.affected)
                         let response = {
                             success: 0,
-                            message: 'DATABASE ERROR: failed to update email',
+                            message:
+                                'Could not find the user with id ' +
+                                userId +
+                                ' or email already exist',
                             data: [{}]
                         }
                         res.json(response)
                     } else {
-                        if (result.affected == 0) {
-                            console.log(result.affected)
-                            let response = {
-                                success: 0,
-                                message:
-                                    'Could not find the user with id ' +
-                                    userId +
-                                    ' or email already exist',
-                                data: [{}]
-                            }
-                            res.json(response)
-                        } else {
-                            console.log(result.affected)
-                            let response = {
-                                success: 1,
-                                message: 'Updated email successfully',
-                                data: [{}]
-                            }
-                            res.json(response)
+                        console.log(result.affected)
+                        let response = {
+                            success: 1,
+                            message: 'Updated email successfully',
+                            data: [{}]
                         }
+                        res.json(response)
                     }
                 }
-            )
-        } else {
-            let response = {
-                success: 0,
-                message: 'email or user id is missing',
-                data: [{}]
             }
-            res.json(response)
+        )
+    }
+
+    // function to handle the /password :PUT endpoint
+    // lets you change the password of the user with user id
+    public changePassword = async (req: Request, res: Response) => {
+        let password = req.body.password
+        let userId = req.body.id
+
+        if (req.body.password == undefined) {
+            res.sendStatus(401).json({
+                success: 0,
+                message: 'missing parameter {password:}',
+                data: [{}]
+            })
         }
+
+		const salt = genSaltSync(10)
+        password = hashSync(password!.toString(), salt)
+
+        if(req.body.id == undefined) {
+            res.sendStatus(401).json({
+                success: 0,
+                message: 'missing parameter {id:}',
+                data: [{}]
+            })
+        }
+
+        this.userServices.updatePassword(
+            password,
+            userId,
+            (error: any, result: any) => {
+                if (error) {
+                    console.log(error)
+                    let response = {
+                        success: 0,
+                        message: 'DATABASE ERROR: failed to update password',
+                        data: [{}]
+                    }
+                    res.json(response)
+                } else {
+                    if (result.affected == 0) {
+                        console.log(result.affected)
+                        let response = {
+                            success: 0,
+                            message:
+                                'Could not find the user with id ' +
+                                userId +
+                                ' or password already exist',
+                            data: [{}]
+                        }
+                        res.json(response)
+                    } else {
+                        console.log(result.affected)
+                        let response = {
+                            success: 1,
+                            message: 'Updated password successfully',
+                            data: [{}]
+                        }
+                        res.json(response)
+                    }
+                }
+            }
+        )
     }
 }
