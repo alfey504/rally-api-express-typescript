@@ -5,6 +5,7 @@ import { hashSync, genSaltSync, compareSync } from 'bcrypt'
 import { sign } from 'jsonwebtoken'
 import * as dotenv from 'dotenv'
 import { Verify } from './users.verification'
+import { Token } from '../../database/entity/tokens'
 
 dotenv.config()
 
@@ -27,6 +28,7 @@ export class UserController {
                 message: 'missing parameter {fullName:}',
                 data: [{}]
             })
+            return
         }
 
         if (req.body.email == undefined) {
@@ -35,13 +37,15 @@ export class UserController {
                 message: 'missing parameter {email:}',
                 data: [{}]
             })
+            return
         } else {
             if (await this.verify.doesEmailExist(req.body.email)) {
-                res.sendStatus(200).json({
+                res.json({
                     success: Verify.USER_EMAIL_ALREADY_EXISTS,
                     message: 'Email already exists',
                     data: [{}]
                 })
+                return
             }
         }
 
@@ -51,6 +55,7 @@ export class UserController {
                 message: 'missing parameter {userName:}',
                 data: [{}]
             })
+            return
         } else {
             if (await this.verify.doesUserNameExist(req.body.userName)) {
                 res.sendStatus(200).json({
@@ -58,6 +63,7 @@ export class UserController {
                     message: 'Username already exists',
                     data: [{}]
                 })
+                return
             }
         }
 
@@ -67,6 +73,7 @@ export class UserController {
                 message: 'missing parameter {password:}',
                 data: [{}]
             })
+            return
         }
 
         // using the service to add the data to the database
@@ -75,11 +82,11 @@ export class UserController {
             user.fullName = req.body.fullName!
             user.email = req.body.email!
             user.userName = req.body.userName!
+            user.verified = false
 
             // encrypt the password
             const salt = genSaltSync(10)
             user.password = hashSync(req.body.password!.toString(), salt)
-            user.verified = req.body.verified!
 
             this.userServices.addUser(user, (error: any, result: any) => {
                 if (error) {
@@ -99,11 +106,14 @@ export class UserController {
                             data: [{}]
                         })
                     } else {
-                        res.json({
-                            success: Verify.USER_USER_ADDED_SUCCESSFULLY,
-                            message: 'Successfully added data to database',
-                            data: [{}]
-                        })
+                        result.then((value: any) => { 
+                            delete value['password']
+                            res.json({
+                                success: Verify.USER_USER_ADDED_SUCCESSFULLY,
+                                message: 'Successfully added data to database',
+                                data: [value]
+                            })
+                        })  
                     }
                 }
             })
@@ -123,11 +133,12 @@ export class UserController {
         const password = req.body.password
 
         if (req.body.userName == undefined) {
-            res.sendStatus(401).json({
+            res.json({
                 success: 0,
                 message: 'miisging parameter {userName:}',
                 data: [{}]
             })
+            return
         }
 
         if (req.body.password == undefined) {
@@ -136,6 +147,7 @@ export class UserController {
                 message: 'missing parameter {password:}',
                 data: [{}]
             })
+            return
         }
 
         this.userServices.getUserByUserName(
@@ -155,21 +167,47 @@ export class UserController {
                     } else {
                         if (compareSync(password, result.password)) {
                             let jsonToken = sign(
-                                { result: result },
+                                {
+                                    user: {
+                                        id: result.id,
+                                        userName: result.userName
+                                    }
+                                },
                                 process.env.TOKEN_ENCRYPTION_KEY!
                             )
-                            res.json({
-                                success: 1,
-                                message: 'Login sucessful',
-                                data: [
-                                    {
-                                        userId: result.id,
-                                        userName: result.userName,
-                                        email: result.email,
-                                        token: jsonToken
+
+                            let token = new Token()
+                            token.user = result.id
+                            token.token = jsonToken
+                            token.blackListed = false
+
+                            this.userServices.saveToken(
+                                token,
+                                 (error: any, resultToken: any) => {
+                                    if (!error) {
+                                        console.log(resultToken)
+                                        res.json({
+                                            success: 1,
+                                            message: 'Login sucessful',
+                                            data: [
+                                                {
+                                                    userId: result.id,
+                                                    userName: result.userName,
+                                                    email: result.email,
+                                                    token: jsonToken
+                                                }
+                                            ]
+                                        })
+                                    } else {
+                                        res.json({
+                                            success: 0,
+                                            message:
+                                                'Login failed, database error',
+                                            data: [{}]
+                                        })
                                     }
-                                ]
-                            })
+                                }
+                            )
                         } else {
                             res.json({
                                 success: 0,
@@ -189,14 +227,14 @@ export class UserController {
         let userId = req.body.id
 
         if (req.body.userName == undefined) {
-            res.sendStatus(401).json({
+            res.json({
                 success: 0,
                 message: 'missing parameter {userName:}',
                 data: [{}]
             })
         } else {
             if (await this.verify.doesUserNameExist(req.body.userName)) {
-                res.sendStatus(200).json({
+                res.json({
                     success: Verify.USER_USERNAME_ALREADY_EXISTS,
                     message: 'Username already exists',
                     data: [{}]
@@ -205,7 +243,7 @@ export class UserController {
         }
 
         if (req.body.id == undefined) {
-            res.sendStatus(401).json({
+            res.json({
                 success: 0,
                 message: 'missing parameter {id:}',
                 data: [{}]
@@ -257,27 +295,30 @@ export class UserController {
         let userId = req.body.id
 
         if (req.body.email == undefined) {
-            res.sendStatus(401).json({
+            res.json({
                 success: 0,
                 message: 'missing parameter {userName:}',
                 data: [{}]
             })
+            return
         } else {
             if (await this.verify.doesEmailExist(req.body.email)) {
-                res.sendStatus(200).json({
+                res.json({
                     success: Verify.USER_USERNAME_ALREADY_EXISTS,
                     message: 'Username already exists',
                     data: [{}]
                 })
+                return
             }
         }
 
         if (req.body.id == undefined) {
-            res.sendStatus(401).json({
+            res.json({
                 success: 0,
                 message: 'missing parameter {id:}',
                 data: [{}]
             })
+            return 
         }
 
         this.userServices.updateEmail(
@@ -325,18 +366,18 @@ export class UserController {
         let userId = req.body.id
 
         if (req.body.password == undefined) {
-            res.sendStatus(401).json({
+            res.json({
                 success: 0,
                 message: 'missing parameter {password:}',
                 data: [{}]
             })
         }
 
-		const salt = genSaltSync(10)
+        const salt = genSaltSync(10)
         password = hashSync(password!.toString(), salt)
 
-        if(req.body.id == undefined) {
-            res.sendStatus(401).json({
+        if (req.body.id == undefined) {
+            res.json({
                 success: 0,
                 message: 'missing parameter {id:}',
                 data: [{}]
@@ -379,5 +420,41 @@ export class UserController {
                 }
             }
         )
+    }
+
+    // function to handle the /logout :DELETE endpoint
+    // lets you expire or blacklist a token
+    public logoutUser = async (req: Request, res: Response) => {
+
+        let token = req.get('authorization')
+        if (token) {
+            token = token.slice(7)
+            console.log(token)
+            this.userServices.blackListToken(token, (err: any, result: any) => {
+                if(!err){
+                    let response = {
+                        success: 1,
+                        message: 'Logged out successfully',
+                        data: [{}]
+                    }
+                    res.json(response)
+                }else{
+                    let response = {
+                        success: 0,
+                        message: 'Logout failed: Database error',
+                        data: [{}]
+                    }
+                    res.json(response)
+                } 
+            })
+
+        }else{
+            let response = {
+                success: 0,
+                message: 'token not found in request',
+                data: [{}]
+            }
+            res.json(response)
+        }
     }
 }

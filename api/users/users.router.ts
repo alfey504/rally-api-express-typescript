@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { UserController } from './users.controller'
 import { VerifyToken } from '../../auth_middleware/token_verification'
+import { verify } from 'crypto'
 
 export const usersRoute = Router()
 export function logUserEndPoints() {
@@ -30,4 +31,15 @@ usersRoute.put(
 usersRoute.put('/email', VerifyToken.verifyToken, userController.changeEmail)
 
 //  change password for userid
-usersRoute.put('/password', VerifyToken.verifyToken, userController.changePassword)
+usersRoute.put(
+    '/password',
+    VerifyToken.verifyToken,
+    userController.changePassword
+)
+
+// logout the user
+usersRoute.delete(
+    '/logout',
+    VerifyToken.verifyToken,
+    userController.logoutUser
+)

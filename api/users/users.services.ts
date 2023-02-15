@@ -1,6 +1,7 @@
 import { getDataSource } from '../../database/data_source'
 import { User } from '../../database/entity/User'
 import { Equal, Repository } from 'typeorm'
+import { Token } from '../../database/entity/tokens'
 
 export class UserServices {
     // add a user to the database
@@ -116,4 +117,38 @@ export class UserServices {
             callback(error)
         }
     }
+
+    // add token to the database
+    public saveToken = async (
+        token: Token,
+        callback: (error?: any, result?: any) => void
+    ) => {
+        try {
+            const rallyDataSource = getDataSource()
+            const rallyRepo = (await rallyDataSource).getRepository(Token)
+            const result = await rallyRepo.save(token)
+            callback(null, result)
+        } catch (error) {
+            callback(error)
+        }
+    }
+
+    // blacklist a token
+    public blackListToken = async(
+        token: string, 
+        callback: (err?: any, result?: any) => void
+    ) => {
+        try {
+            const rallyDataSource = getDataSource()
+            const rallyRepo = (await rallyDataSource).getRepository(Token)
+            const result = await rallyRepo.update(
+                { token: Equal(token)},
+                { blackListed: true}
+            )
+            callback(null, result)
+        }catch (error){
+            callback(error)
+        }
+    }
+    
 }

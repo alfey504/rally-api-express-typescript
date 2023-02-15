@@ -2,6 +2,9 @@ import { DataSource } from 'typeorm'
 import 'reflect-metadata'
 import * as dotenv from 'dotenv'
 import { User } from './entity/User'
+import { Category } from './entity/category'
+import { Menu } from './entity/menu'
+import { Token } from './entity/tokens'
 
 dotenv.config()
 
@@ -12,7 +15,7 @@ const rallyDataSource = new DataSource({
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    entities: [User]
+    entities: [User, Category, Menu, Token]
 })
 
 rallyDataSource
