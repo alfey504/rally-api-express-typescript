@@ -6,7 +6,7 @@ import {
     ManyToOne,
     JoinColumn
 } from 'typeorm'
-import { User } from './User'
+import { User } from './users'
 
 @Entity()
 export class Token {

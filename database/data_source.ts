@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm'
 import 'reflect-metadata'
 import * as dotenv from 'dotenv'
-import { User } from './entity/User'
+import { User } from './entity/users'
 import { Category } from './entity/category'
 import { Menu } from './entity/menu'
 import { Token } from './entity/tokens'

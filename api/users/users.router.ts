@@ -1,9 +1,9 @@
 import { Router } from 'express'
 import { UserController } from './users.controller'
 import { VerifyToken } from '../../auth_middleware/token_verification'
-import { verify } from 'crypto'
 
 export const usersRoute = Router()
+
 export function logUserEndPoints() {
     console.log('/register                  METHOD:POST')
     console.log('/login                     METHOD:POST')
@@ -38,8 +38,4 @@ usersRoute.put(
 )
 
 // logout the user
-usersRoute.delete(
-    '/logout',
-    VerifyToken.verifyToken,
-    userController.logoutUser
-)
+usersRoute.delete('/logout', VerifyToken.verifyToken, userController.logoutUser)

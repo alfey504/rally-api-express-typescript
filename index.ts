@@ -2,6 +2,8 @@ import express, { Express, Request, Response } from 'express'
 import * as dotenv from 'dotenv'
 import { usersRoute, logUserEndPoints } from './api/users/users.router'
 import 'reflect-metadata'
+import { categoryRouter } from './api/category/category.routes'
+import { menuRouter } from './api/menu/menu.routes'
 
 dotenv.config()
 
@@ -10,6 +12,8 @@ app.use(express.json())
 const port = process.env.PORT || '8000'
 
 app.use('/api/users', usersRoute)
+app.use('/api/category', categoryRouter)
+app.use('/api/menu', menuRouter)
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Home')

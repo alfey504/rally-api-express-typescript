@@ -1,4 +1,4 @@
-import { User } from '../../database/entity/User'
+import { User } from '../../database/entity/users'
 import { Request, Response } from 'express'
 import { UserServices } from './users.services'
 import { hashSync, genSaltSync, compareSync } from 'bcrypt'
@@ -38,15 +38,15 @@ export class UserController {
                 data: [{}]
             })
             return
-        } else {
-            if (await this.verify.doesEmailExist(req.body.email)) {
-                res.json({
-                    success: Verify.USER_EMAIL_ALREADY_EXISTS,
-                    message: 'Email already exists',
-                    data: [{}]
-                })
-                return
-            }
+        }
+
+        if (await this.verify.doesEmailExist(req.body.email)) {
+            res.json({
+                success: Verify.USER_EMAIL_ALREADY_EXISTS,
+                message: 'Email already exists',
+                data: [{}]
+            })
+            return
         }
 
         if (req.body.userName == undefined) {
@@ -56,15 +56,15 @@ export class UserController {
                 data: [{}]
             })
             return
-        } else {
-            if (await this.verify.doesUserNameExist(req.body.userName)) {
-                res.sendStatus(200).json({
-                    success: Verify.USER_USERNAME_ALREADY_EXISTS,
-                    message: 'Username already exists',
-                    data: [{}]
-                })
-                return
-            }
+        }
+
+        if (await this.verify.doesUserNameExist(req.body.userName)) {
+            res.json({
+                success: Verify.USER_USERNAME_ALREADY_EXISTS,
+                message: 'Username already exists',
+                data: [{}]
+            })
+            return
         }
 
         if (req.body.password == undefined) {
@@ -90,39 +90,49 @@ export class UserController {
 
             this.userServices.addUser(user, (error: any, result: any) => {
                 if (error) {
-                    res.json({
+                    let response = {
                         success: 0,
                         message:
                             'DATABASE ERROR: failed to add user to data base',
                         data: [{}]
-                    })
-                } else {
-                    console.log(result.toString())
-                    if (!result) {
-                        res.json({
-                            success: 0,
-                            message:
-                                'DATABASE ERROR: failed to add user to data base',
-                            data: [{}]
-                        })
-                    } else {
-                        result.then((value: any) => { 
-                            delete value['password']
-                            res.json({
-                                success: Verify.USER_USER_ADDED_SUCCESSFULLY,
-                                message: 'Successfully added data to database',
-                                data: [value]
-                            })
-                        })  
                     }
+                    res.json(response)
+                    return
                 }
+
+                console.log(result.toString())
+                if (!result) {
+                    let response = {
+                        success: 0,
+                        message:
+                            'DATABASE ERROR: failed to add user to data base',
+                        data: [{}]
+                    }
+                    res.json(response)
+                    return
+                }
+
+                result.then((value: any) => {
+                    delete value['password']
+
+                    let response = {
+                        success: Verify.USER_USER_ADDED_SUCCESSFULLY,
+                        message: 'Successfully added data to database',
+                        data: [value]
+                    }
+                    res.json(response)
+                })
             })
         } catch (error) {
             console.log(error)
-            res.json({
+
+            let response = {
                 success: 0,
-                message: 'DATABASE ERROR: failed to add user to data base'
-            })
+                message: 'DATABASE ERROR: failed to add user to data base',
+                data: [{}]
+            }
+
+            res.json(response)
         }
     }
 
@@ -158,64 +168,74 @@ export class UserController {
                         success: 0,
                         message: 'Login failed database error'
                     })
-                } else {
-                    if (!result) {
-                        res.json({
-                            success: 0,
-                            message: 'Login failed user does not exist'
-                        })
-                    } else {
-                        if (compareSync(password, result.password)) {
-                            let jsonToken = sign(
-                                {
-                                    user: {
-                                        id: result.id,
-                                        userName: result.userName
-                                    }
-                                },
-                                process.env.TOKEN_ENCRYPTION_KEY!
-                            )
-
-                            let token = new Token()
-                            token.user = result.id
-                            token.token = jsonToken
-                            token.blackListed = false
-
-                            this.userServices.saveToken(
-                                token,
-                                 (error: any, resultToken: any) => {
-                                    if (!error) {
-                                        console.log(resultToken)
-                                        res.json({
-                                            success: 1,
-                                            message: 'Login sucessful',
-                                            data: [
-                                                {
-                                                    userId: result.id,
-                                                    userName: result.userName,
-                                                    email: result.email,
-                                                    token: jsonToken
-                                                }
-                                            ]
-                                        })
-                                    } else {
-                                        res.json({
-                                            success: 0,
-                                            message:
-                                                'Login failed, database error',
-                                            data: [{}]
-                                        })
-                                    }
-                                }
-                            )
-                        } else {
-                            res.json({
-                                success: 0,
-                                message: 'Incorrect password'
-                            })
-                        }
-                    }
                 }
+
+                if (!result) {
+                    let response = {
+                        success: 0,
+                        message: 'Login failed user does not exist',
+                        data: [{}]
+                    }
+                    res.json(response)
+                    return
+                }
+
+                if (!compareSync(password, result.password)) {
+                    let response = {
+                        success: 0,
+                        message: 'Login failed incorrect password',
+                        data: [{}]
+                    }
+                    res.json(response)
+                    return
+                }
+
+                let jsonToken = sign(
+                    {
+                        user: {
+                            id: result.id,
+                            userName: result.userName
+                        }
+                    },
+                    process.env.TOKEN_ENCRYPTION_KEY!
+                )
+
+                let token = new Token()
+                token.user = result.id
+                token.token = jsonToken
+                token.blackListed = false
+
+                this.userServices.saveToken(
+                    token,
+                    (error: any, resultToken: any) => {
+                        if (error) {
+                            let response = {
+                                success: 0,
+                                message:
+                                    'Could not genarate token : Databse error',
+                                data: [{}]
+                            }
+                            res.json(response)
+                            return
+                        }
+
+                        console.log(resultToken)
+
+                        let response = {
+                            success: 1,
+                            message: 'Login sucessful',
+                            data: [
+                                {
+                                    userId: result.id,
+                                    userName: result.userName,
+                                    email: result.email,
+                                    token: jsonToken
+                                }
+                            ]
+                        }
+                        res.json(response)
+                    }
+                )
             }
         )
     }
@@ -318,7 +338,7 @@ export class UserController {
                 message: 'missing parameter {id:}',
                 data: [{}]
             })
-            return 
+            return
         }
 
         this.userServices.updateEmail(
@@ -425,30 +445,28 @@ export class UserController {
     // function to handle the /logout :DELETE endpoint
     // lets you expire or blacklist a token
     public logoutUser = async (req: Request, res: Response) => {
-
         let token = req.get('authorization')
         if (token) {
             token = token.slice(7)
             console.log(token)
             this.userServices.blackListToken(token, (err: any, result: any) => {
-                if(!err){
+                if (!err) {
                     let response = {
                         success: 1,
                         message: 'Logged out successfully',
                         data: [{}]
                     }
                     res.json(response)
-                }else{
+                } else {
                     let response = {
                         success: 0,
                         message: 'Logout failed: Database error',
                         data: [{}]
                     }
                     res.json(response)
-                } 
+                }
             })
-
-        }else{
+        } else {
             let response = {
                 success: 0,
                 message: 'token not found in request',

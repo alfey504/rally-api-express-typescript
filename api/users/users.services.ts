@@ -1,5 +1,5 @@
 import { getDataSource } from '../../database/data_source'
-import { User } from '../../database/entity/User'
+import { User } from '../../database/entity/users'
 import { Equal, Repository } from 'typeorm'
 import { Token } from '../../database/entity/tokens'
 
@@ -134,21 +134,20 @@ export class UserServices {
     }
 
     // blacklist a token
-    public blackListToken = async(
-        token: string, 
+    public blackListToken = async (
+        token: string,
         callback: (err?: any, result?: any) => void
     ) => {
         try {
             const rallyDataSource = getDataSource()
             const rallyRepo = (await rallyDataSource).getRepository(Token)
             const result = await rallyRepo.update(
-                { token: Equal(token)},
-                { blackListed: true}
+                { token: Equal(token) },
+                { blackListed: true }
             )
             callback(null, result)
-        }catch (error){
+        } catch (error) {
             callback(error)
         }
     }
-    
 }
