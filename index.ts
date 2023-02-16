@@ -12,8 +12,8 @@ app.use(express.json())
 const port = process.env.PORT || '8000'
 
 app.use('/api/users', usersRoute)
-app.use('/api/category', categoryRouter)
-app.use('/api/menu', menuRouter)
+app.use('/api/category', categoryRouter) 
+app.use('/api/menu', menuRouter) 
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Home')
