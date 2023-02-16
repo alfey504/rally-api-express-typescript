@@ -1,73 +1,79 @@
-import { getDataSource } from '../../database/data_source'
-import { Menu } from '../../database/entity/menu'
 import { Equal } from 'typeorm'
+import { getDataSource } from '../../database/data_source'
+import { Cart } from '../../database/entity/carts'
 
-export class MenuServices {
-    
-    public getAllMenu = async (callback: (err?: any, result?: any) => void) => {
+
+export class CartServices{
+
+    public getUsersCart =async (
+        userId: number, 
+        callback: (err?: any, result?: any) => void
+    ) => {
         try {
             const rallyDataSource = getDataSource()
-            const rallyRepo = (await rallyDataSource).getRepository(Menu)
+            const rallyRepo = (await rallyDataSource).getRepository(Cart)
             const result = await rallyRepo.find({
                 relations: {
-                    category: true
+                    user: true,
+                    menu: true
+                },
+                where: {
+                    user: Equal(userId)
                 }
             })
             callback(null, result)
         } catch (error) {
             
             callback(error)
-        }
+        }  
     }
 
-    public getMenuByCategory = async (
-        categoryid: number,
+    public getCartItem =async (
+        cartId: number, 
         callback: (err?: any, result?: any) => void
     ) => {
         try {
             const rallyDataSource = getDataSource()
-            const rallyRepo = (await rallyDataSource).getRepository(Menu)
+            const rallyRepo = (await rallyDataSource).getRepository(Cart)
             const result = await rallyRepo.find({
-                relations: {
-                    category: true
-                },
                 where: {
-                    category: Equal(categoryid)
+                    id: Equal(cartId)
                 }
             })
             callback(null, result)
         } catch (error) {
+            
             callback(error)
-        }
+        }  
     }
-
-    public addMenu = async (
-        menuItem: Menu,
+    
+    public addToCart =async (
+        cart: Cart, 
         callback: (err?: any, result?: any) => void
     ) => {
         try {
             const rallyDataSource = getDataSource()
-            const rallyRepo = (await rallyDataSource).getRepository(Menu)
-            const result = await rallyRepo.save(menuItem)
+            const rallyRepo = (await rallyDataSource).getRepository(Cart)
+            const result = await rallyRepo.save(cart)
             callback(null, result)
         } catch (error) {
             callback(error)
-        }
+        }  
     }
 
-    public removeMenuItem = async (
-        id: number,
+    public deleteFromCart =async (
+        cartId: number, 
         callback: (err?: any, result?: any) => void
     ) => {
         try {
             const rallyDataSource = getDataSource()
-            const rallyRepo = (await rallyDataSource).getRepository(Menu)
+            const rallyRepo = (await rallyDataSource).getRepository(Cart)
             const result = await rallyRepo.delete({
-                id: id
+                id: cartId
             })
             callback(null, result)
         } catch (error) {
             callback(error)
-        }
+        }  
     }
 }
