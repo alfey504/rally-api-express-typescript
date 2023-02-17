@@ -1,6 +1,7 @@
 import { Equal } from 'typeorm'
 import { getDataSource } from '../../database/data_source'
 import { Cart } from '../../database/entity/carts'
+import { Menu } from '../../database/entity/menu'
 
 
 export class CartServices{
@@ -35,7 +36,7 @@ export class CartServices{
         try {
             const rallyDataSource = getDataSource()
             const rallyRepo = (await rallyDataSource).getRepository(Cart)
-            const result = await rallyRepo.find({
+            const result = await rallyRepo.findOne({
                 where: {
                     id: Equal(cartId)
                 }
@@ -76,4 +77,24 @@ export class CartServices{
             callback(error)
         }  
     }
+
+    public getMenuItem =async (
+        menuId: number, 
+        callback: (err?: any, result?: any) => void
+    ) => {
+        try {
+            const rallyDataSource = getDataSource()
+            const rallyRepo = (await rallyDataSource).getRepository(Menu)
+            const result = await rallyRepo.findOne({
+                where: {
+                    id: menuId
+                }
+            })
+            callback(null, result)
+        } catch (error) {
+            callback(error)
+        }  
+    }
+
+
 }
