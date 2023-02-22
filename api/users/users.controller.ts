@@ -50,7 +50,7 @@ export class UserController {
         }
 
         if (req.body.userName == undefined || this.verify.isStringEmpty(req.body.userName)) {
-            res.status(401).json({
+            res.status(400).json({
                 success: 0,
                 message: 'missing parameter {userName:}',
                 data: [{}]
