@@ -23,7 +23,7 @@ export class UserController {
     public registerUser = async (req: Request, res: Response) => {
         // verifying the data
         if (req.body.fullName == undefined) {
-            res.sendStatus(401).json({
+            res.status(400).json({
                 success: 0,
                 message: 'missing parameter {fullName:}',
                 data: [{}]
@@ -32,7 +32,7 @@ export class UserController {
         }
 
         if (req.body.email == undefined) {
-            res.sendStatus(401).json({
+            res.status(400).json({
                 success: 0,
                 message: 'missing parameter {email:}',
                 data: [{}]
@@ -41,7 +41,7 @@ export class UserController {
         }
 
         if (await this.verify.doesEmailExist(req.body.email)) {
-            res.json({
+            res.status(409).json({
                 success: Verify.USER_EMAIL_ALREADY_EXISTS,
                 message: 'Email already exists',
                 data: [{}]
@@ -50,7 +50,7 @@ export class UserController {
         }
 
         if (req.body.userName == undefined) {
-            res.sendStatus(401).json({
+            res.status(401).json({
                 success: 0,
                 message: 'missing parameter {userName:}',
                 data: [{}]
@@ -59,7 +59,7 @@ export class UserController {
         }
 
         if (await this.verify.doesUserNameExist(req.body.userName)) {
-            res.json({
+            res.status(409).json({
                 success: Verify.USER_USERNAME_ALREADY_EXISTS,
                 message: 'Username already exists',
                 data: [{}]
@@ -68,7 +68,7 @@ export class UserController {
         }
 
         if (req.body.password == undefined) {
-            res.sendStatus(401).json({
+            res.status(400).json({
                 success: 0,
                 message: 'missing parameter {password:}',
                 data: [{}]
@@ -96,7 +96,7 @@ export class UserController {
                             'DATABASE ERROR: failed to add user to data base',
                         data: [{}]
                     }
-                    res.json(response)
+                    res.status(500).json(response)
                     return
                 }
 
@@ -108,7 +108,7 @@ export class UserController {
                             'DATABASE ERROR: failed to add user to data base',
                         data: [{}]
                     }
-                    res.json(response)
+                    res.status(500).json(response)
                     return
                 }
 
@@ -117,7 +117,7 @@ export class UserController {
 
                     let response = {
                         success: Verify.USER_USER_ADDED_SUCCESSFULLY,
-                        message: 'Successfully added data to database',
+                        message: 'Successfully added user to database',
                         data: [value]
                     }
                     res.json(response)
@@ -132,7 +132,7 @@ export class UserController {
                 data: [{}]
             }
 
-            res.json(response)
+            res.status(500).json(response)
         }
     }
 
@@ -143,20 +143,22 @@ export class UserController {
         const password = req.body.password
 
         if (req.body.userName == undefined) {
-            res.json({
+            let response = {
                 success: 0,
                 message: 'miisging parameter {userName:}',
                 data: [{}]
-            })
+            }
+            res.status(400).json(response)
             return
         }
 
         if (req.body.password == undefined) {
-            res.sendStatus(401).json({
+            let response = {
                 success: 0,
                 message: 'missing parameter {password:}',
                 data: [{}]
-            })
+            }
+            res.status(400).json()
             return
         }
 
@@ -164,15 +166,17 @@ export class UserController {
             userName,
             (error: any, result: any) => {
                 if (error) {
-                    res.json({
+                    let response = {
                         success: 0,
-                        message: 'Login failed database error'
-                    })
+                        message: 'Login failed database error',
+                        data: [{}]
+                    }
+                    res.status(500).json(response)
                 }
 
                 if (!result) {
                     let response = {
-                        success: 0,
+                        success: Verify.USER_USERNAME_DOES_NOT_EXIST,
                         message: 'Login failed user does not exist',
                         data: [{}]
                     }
@@ -182,7 +186,7 @@ export class UserController {
 
                 if (!compareSync(password, result.password)) {
                     let response = {
-                        success: 0,
+                        success: Verify.USER_INCORECT_PASSWORD,
                         message: 'Login failed incorrect password',
                         data: [{}]
                     }
@@ -215,11 +219,9 @@ export class UserController {
                                     'Could not genarate token : Databse error',
                                 data: [{}]
                             }
-                            res.json(response)
+                            res.status(500).json(response)
                             return
                         }
-
-                        console.log(resultToken)
 
                         let response = {
                             success: 1,
@@ -247,27 +249,30 @@ export class UserController {
         let userId = req.body.id
 
         if (req.body.userName == undefined) {
-            res.json({
+            let response = {
                 success: 0,
                 message: 'missing parameter {userName:}',
                 data: [{}]
-            })
+            }
+            res.status(400).json()
         } else {
             if (await this.verify.doesUserNameExist(req.body.userName)) {
-                res.json({
+                let response = {
                     success: Verify.USER_USERNAME_ALREADY_EXISTS,
                     message: 'Username already exists',
                     data: [{}]
-                })
+                }
+                res.status(409).json()
             }
         }
 
         if (req.body.id == undefined) {
-            res.json({
+            let response = {
                 success: 0,
                 message: 'missing parameter {id:}',
                 data: [{}]
-            })
+            }
+            res.status(400).json()
         }
 
         this.userServices.updateUserName(
@@ -281,21 +286,20 @@ export class UserController {
                         message: 'DATABASE ERROR: failed to update username',
                         data: [{}]
                     }
-                    res.json(response)
+                    res.status(500).json(response)
                 } else {
                     if (result.affected == 0 || !result) {
                         console.log(result.affected)
                         let response = {
-                            success: 0,
+                            success: Verify.USER_ID_DOES_NOT_EXIST,
                             message:
                                 'Could not find the user with ' +
                                 userId +
                                 ' or username already exist',
                             data: [{}]
                         }
-                        res.json(response)
+                        res.status(409).json(response)
                     } else {
-                        console.log(result.affected)
                         let response = {
                             success: 1,
                             message: 'Updated username successfully',
@@ -315,29 +319,32 @@ export class UserController {
         let userId = req.body.id
 
         if (req.body.email == undefined) {
-            res.json({
+            let response = {
                 success: 0,
                 message: 'missing parameter {userName:}',
                 data: [{}]
-            })
+            }
+            res.status(400).json(response)
             return
         } else {
             if (await this.verify.doesEmailExist(req.body.email)) {
-                res.json({
+                let response = {
                     success: Verify.USER_USERNAME_ALREADY_EXISTS,
                     message: 'Username already exists',
                     data: [{}]
-                })
+                }
+                res.status(409).json(response)
                 return
             }
         }
 
         if (req.body.id == undefined) {
-            res.json({
+            let response = {
                 success: 0,
                 message: 'missing parameter {id:}',
                 data: [{}]
-            })
+            }
+            res.status(400).json(response)
             return
         }
 
@@ -352,19 +359,19 @@ export class UserController {
                         message: 'DATABASE ERROR: failed to update email',
                         data: [{}]
                     }
-                    res.json(response)
+                    res.status(500).json(response)
                 } else {
                     if (result.affected == 0) {
                         console.log(result.affected)
                         let response = {
-                            success: 0,
+                            success: Verify.USER_ID_DOES_NOT_EXIST,
                             message:
                                 'Could not find the user with id ' +
                                 userId +
                                 ' or email already exist',
                             data: [{}]
                         }
-                        res.json(response)
+                        res.status(409).json(response)
                     } else {
                         console.log(result.affected)
                         let response = {
@@ -386,22 +393,24 @@ export class UserController {
         let userId = req.body.id
 
         if (req.body.password == undefined) {
-            res.json({
+            let response = {
                 success: 0,
                 message: 'missing parameter {password:}',
                 data: [{}]
-            })
+            }
+            res.status(400).json(response)
         }
 
         const salt = genSaltSync(10)
         password = hashSync(password!.toString(), salt)
 
         if (req.body.id == undefined) {
-            res.json({
+            let response = {
                 success: 0,
                 message: 'missing parameter {id:}',
                 data: [{}]
-            })
+            }
+            res.status(400).json(response)
         }
 
         this.userServices.updatePassword(
@@ -415,19 +424,19 @@ export class UserController {
                         message: 'DATABASE ERROR: failed to update password',
                         data: [{}]
                     }
-                    res.json(response)
+                    res.status(500).json(response)
                 } else {
                     if (result.affected == 0) {
                         console.log(result.affected)
                         let response = {
-                            success: 0,
+                            success: Verify.USER_ID_DOES_NOT_EXIST,
                             message:
                                 'Could not find the user with id ' +
                                 userId +
                                 ' or password already exist',
                             data: [{}]
                         }
-                        res.json(response)
+                        res.status(409).json(response)
                     } else {
                         console.log(result.affected)
                         let response = {
@@ -463,7 +472,7 @@ export class UserController {
                         message: 'Logout failed: Database error',
                         data: [{}]
                     }
-                    res.json(response)
+                    res.status(500).json(response)
                 }
             })
         } else {
@@ -472,7 +481,7 @@ export class UserController {
                 message: 'token not found in request',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
         }
     }
 }

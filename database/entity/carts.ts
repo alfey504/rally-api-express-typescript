@@ -5,7 +5,6 @@ import {
     ManyToOne,
     JoinColumn
 } from 'typeorm'
-import { Category } from './category'
 import { Menu } from './menu'
 import { User } from './users'
 

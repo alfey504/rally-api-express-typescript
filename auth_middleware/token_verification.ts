@@ -26,7 +26,7 @@ export class VerifyToken {
                             message: 'Invaild Token',
                             data: [{}]
                         }
-                        res.json(response)
+                        res.status(401).json(response)
                     } else {
                         if (await this.isTokenBlacklisted(token!)) {
                             next()
@@ -36,7 +36,7 @@ export class VerifyToken {
                                 message: 'Invaild Token',
                                 data: [{}]
                             }
-                            res.json(response)
+                            res.status(401).json(response)
                         }
                     }
                 }
@@ -47,7 +47,7 @@ export class VerifyToken {
                 message: 'Access denied! make sure you have a token',
                 data: [{}]
             }
-            res.json(response)
+            res.status(401).json(response)
         }
     }
 
