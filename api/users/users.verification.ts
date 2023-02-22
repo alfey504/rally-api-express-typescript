@@ -1,6 +1,7 @@
 import { UserServices } from './users.services'
 
 export class Verify {
+
     public static USER_USER_ADDED_SUCCESSFULLY: number = 100
     public static USER_USERNAME_ALREADY_EXISTS: number = 101
     public static USER_EMAIL_ALREADY_EXISTS: number = 102
@@ -53,5 +54,10 @@ export class Verify {
         }
         await this.userSevices.getUserByUserName(userName, callback)
         return exist!
+    }
+
+    public isStringEmpty = (string: String): Boolean => {
+        const hasOnlyWhitespace = string.trim().length === 0
+        return hasOnlyWhitespace
     }
 }

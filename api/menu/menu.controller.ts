@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import { Menu } from '../../database/entity/menu'
 
 export class MenuController {
+    
     menuServices: MenuServices
 
     constructor() {

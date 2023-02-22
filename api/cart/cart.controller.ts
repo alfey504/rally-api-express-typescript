@@ -22,7 +22,7 @@ export class CartController{
                 message: 'missing parameter {userId:} in request',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
             return
         }
 
@@ -32,12 +32,26 @@ export class CartController{
                 message: 'missing parameter {menuId:} in request',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
             return
         }
 
         if(req.body.quatntiy != undefined){
-            quantity = +req.body.quantity
+            try{
+
+                quantity = +req.body.quantity
+
+            }catch(error){
+
+                let response = {
+                    success: 0,
+                    message: 'invalid quantity',
+                    data: [{}]
+                }
+                res.status(400).json(response)
+                return
+            }
+           
         }
 
         await this.cartServices.getMenuItem(+req.body.menuId, async (err: any, menuItem: any) => {
@@ -47,19 +61,19 @@ export class CartController{
                     message: 'Failed to add Cart Item: Database Error',
                     data: [{}]
                 }
-                res.json(response)
+                res.status(500).json(response)
                 return
             }
-
-            let itemPrice = new BigNumber(menuItem.price)
-            let quantity = new BigNumber(req.body.quantity)
             
-            let price = itemPrice.multipliedBy(quantity)
+            let itemPrice = new BigNumber(menuItem.price)
+            let bigQuantity = new BigNumber(quantity)
+            
+            let price = itemPrice.multipliedBy(bigQuantity)
 
             let cart = new Cart()
             cart.menu = menuItem.id
             cart.user = req.body.userId
-            cart.quantity = req.body.quantity
+            cart.quantity = quantity
             cart.price = price.toString()
 
             await this.cartServices.addToCart(cart, (err: any, result: any) => {
@@ -69,7 +83,7 @@ export class CartController{
                         message: 'Failed to add Cart Item: Database Error',
                         data: [{}]
                     }
-                    res.json(response)
+                    res.status(500).json(response)
                     return
                 }
 
@@ -93,7 +107,7 @@ export class CartController{
                 message: 'missing parameter {userId:} in request',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
             return
         }
 
@@ -104,7 +118,7 @@ export class CartController{
                     message: 'Failed to fetch data from cart: Database Error',
                     data: [{}]
                 }
-                res.json(response)
+                res.status(400).json(response)
                 return 
             }
 
@@ -126,7 +140,7 @@ export class CartController{
                 message: 'missing parameter {userId:} in request',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
             return
         }
 
@@ -137,7 +151,7 @@ export class CartController{
                     message: 'Failed to fetch data from cart: Database Error',
                     data: [{}]
                 }
-                res.json(response)
+                res.status(500).json(response)
                 return 
             }
 
@@ -156,10 +170,10 @@ export class CartController{
         if(req.params.cartId == undefined) {
             let response = {
                 success: 0,
-                message: 'missing parameter {userId:} in request',
+                message: 'missing parameter {cartId:} in request',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
             return
         }
 
@@ -170,7 +184,7 @@ export class CartController{
                     message: 'Failed to delete data from cart: Database Error',
                     data: [{}]
                 }
-                res.json(response)
+                res.status(500).json(response)
                 return 
             }
 

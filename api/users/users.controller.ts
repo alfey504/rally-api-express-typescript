@@ -22,7 +22,7 @@ export class UserController {
     // verify the data in the requeat and use service to add data to the database
     public registerUser = async (req: Request, res: Response) => {
         // verifying the data
-        if (req.body.fullName == undefined) {
+        if (req.body.fullName == undefined || this.verify.isStringEmpty(req.body.fullName)) {
             res.status(400).json({
                 success: 0,
                 message: 'missing parameter {fullName:}',
@@ -31,7 +31,7 @@ export class UserController {
             return
         }
 
-        if (req.body.email == undefined) {
+        if (req.body.email == undefined || this.verify.isStringEmpty(req.body.email)) {
             res.status(400).json({
                 success: 0,
                 message: 'missing parameter {email:}',
@@ -49,7 +49,7 @@ export class UserController {
             return
         }
 
-        if (req.body.userName == undefined) {
+        if (req.body.userName == undefined || this.verify.isStringEmpty(req.body.userName)) {
             res.status(401).json({
                 success: 0,
                 message: 'missing parameter {userName:}',
@@ -67,7 +67,7 @@ export class UserController {
             return
         }
 
-        if (req.body.password == undefined) {
+        if (req.body.password == undefined ||  this.verify.isStringEmpty(req.body.password)) {
             res.status(400).json({
                 success: 0,
                 message: 'missing parameter {password:}',
