@@ -246,7 +246,7 @@ export class UserController {
     // verify the data in the requeat and use service to verify the password and genrate a token and start a session
     public changeUserName = async (req: Request, res: Response) => {
         let userName = req.body.userName
-        let userId = req.body.id
+        let userId = req.body.userId
 
         if (req.body.userName == undefined) {
             let response = {
@@ -268,7 +268,7 @@ export class UserController {
             return
         }
 
-        if (req.body.id == undefined) {
+        if (req.body.userId == undefined) {
             let response = {
                 success: 0,
                 message: 'missing parameter {id:}',
@@ -322,7 +322,7 @@ export class UserController {
     // lets you change the email of the user with user id
     public changeEmail = async (req: Request, res: Response) => {
         let email = req.body.email
-        let userId = req.body.id
+        let userId = req.body.userId
 
         if (req.body.email == undefined) {
             let response = {
@@ -345,7 +345,7 @@ export class UserController {
             return
         }
 
-        if (req.body.id == undefined) {
+        if (req.body.userId == undefined) {
             let response = {
                 success: 0,
                 message: 'missing parameter {id:}',
@@ -400,7 +400,7 @@ export class UserController {
     // lets you change the password of the user with user id
     public changePassword = async (req: Request, res: Response) => {
         let password = req.body.password
-        let userId = req.body.id
+        let userId = req.body.userId
 
         if (req.body.password == undefined) {
             let response = {
@@ -415,7 +415,7 @@ export class UserController {
         const salt = genSaltSync(10)
         password = hashSync(password!.toString(), salt)
 
-        if (req.body.id == undefined) {
+        if (req.body.userId == undefined) {
             let response = {
                 success: 0,
                 message: 'missing parameter {id:}',
