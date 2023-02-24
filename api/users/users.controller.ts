@@ -255,15 +255,17 @@ export class UserController {
                 data: [{}]
             }
             res.status(400).json()
-        } else {
-            if (await this.verify.doesUserNameExist(req.body.userName)) {
-                let response = {
-                    success: Verify.USER_USERNAME_ALREADY_EXISTS,
-                    message: 'Username already exists',
-                    data: [{}]
-                }
-                res.status(409).json()
+            return
+        } 
+
+        if (await this.verify.doesUserNameExist(req.body.userName)) {
+            let response = {
+                success: Verify.USER_USERNAME_ALREADY_EXISTS,
+                message: 'Username already exists',
+                data: [{}]
             }
+            res.status(409).json()
+            return
         }
 
         if (req.body.id == undefined) {
@@ -272,7 +274,8 @@ export class UserController {
                 message: 'missing parameter {id:}',
                 data: [{}]
             }
-            res.status(400).json()
+            res.status(400).json(response)
+            return
         }
 
         this.userServices.updateUserName(
@@ -287,27 +290,30 @@ export class UserController {
                         data: [{}]
                     }
                     res.status(500).json(response)
-                } else {
-                    if (result.affected == 0 || !result) {
-                        console.log(result.affected)
-                        let response = {
-                            success: Verify.USER_ID_DOES_NOT_EXIST,
-                            message:
-                                'Could not find the user with ' +
-                                userId +
-                                ' or username already exist',
-                            data: [{}]
-                        }
-                        res.status(409).json(response)
-                    } else {
-                        let response = {
-                            success: 1,
-                            message: 'Updated username successfully',
-                            data: [{}]
-                        }
-                        res.json(response)
-                    }
+                    return
                 }
+                
+                if (result.affected == 0 || !result) {
+                    console.log(result.affected)
+                    let response = {
+                        success: Verify.USER_ID_DOES_NOT_EXIST,
+                        message:
+                            'Could not find the user with ' +
+                            userId +
+                            ' or username already exist',
+                        data: [{}]
+                    }
+                    res.status(409).json(response)
+                    return
+                } 
+                
+                let response = {
+                    success: 1,
+                    message: 'Updated username successfully',
+                    data: [{}]
+                }
+                res.json(response)
+                return
             }
         )
     }
@@ -326,6 +332,7 @@ export class UserController {
             }
             res.status(400).json(response)
             return
+
         } else {
             if (await this.verify.doesEmailExist(req.body.email)) {
                 let response = {
@@ -399,6 +406,7 @@ export class UserController {
                 data: [{}]
             }
             res.status(400).json(response)
+            return
         }
 
         const salt = genSaltSync(10)
@@ -411,6 +419,7 @@ export class UserController {
                 data: [{}]
             }
             res.status(400).json(response)
+            return
         }
 
         this.userServices.updatePassword(

@@ -21,6 +21,7 @@ export class VerifyToken {
                 process.env.TOKEN_ENCRYPTION_KEY!,
                 async (err: any, decoded: any) => {
                     if (err) {
+                        console.log('invalid token')
                         let response = {
                             sucess: 0,
                             message: 'Invaild Token',
@@ -42,6 +43,7 @@ export class VerifyToken {
                 }
             )
         } else {
+            console.log('token does not exist')
             let response = {
                 sucess: 0,
                 message: 'Access denied! make sure you have a token',
