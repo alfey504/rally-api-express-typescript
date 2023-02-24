@@ -333,16 +333,16 @@ export class UserController {
             res.status(400).json(response)
             return
 
-        } else {
-            if (await this.verify.doesEmailExist(req.body.email)) {
-                let response = {
-                    success: Verify.USER_USERNAME_ALREADY_EXISTS,
-                    message: 'Username already exists',
-                    data: [{}]
-                }
-                res.status(409).json(response)
-                return
+        } 
+        
+        if (await this.verify.doesEmailExist(req.body.email)) {
+            let response = {
+                success: Verify.USER_USERNAME_ALREADY_EXISTS,
+                message: 'Username already exists',
+                data: [{}]
             }
+            res.status(409).json(response)
+            return
         }
 
         if (req.body.id == undefined) {
@@ -367,28 +367,31 @@ export class UserController {
                         data: [{}]
                     }
                     res.status(500).json(response)
-                } else {
-                    if (result.affected == 0) {
-                        console.log(result.affected)
-                        let response = {
-                            success: Verify.USER_ID_DOES_NOT_EXIST,
-                            message:
-                                'Could not find the user with id ' +
-                                userId +
-                                ' or email already exist',
-                            data: [{}]
-                        }
-                        res.status(409).json(response)
-                    } else {
-                        console.log(result.affected)
-                        let response = {
-                            success: 1,
-                            message: 'Updated email successfully',
-                            data: [{}]
-                        }
-                        res.json(response)
+                    return
+                } 
+                    
+                if (result.affected == 0) {
+                    console.log(result.affected)
+                    let response = {
+                        success: Verify.USER_ID_DOES_NOT_EXIST,
+                        message:
+                            'Could not find the user with id ' +
+                            userId +
+                            ' or email already exist',
+                        data: [{}]
                     }
+                    res.status(409).json(response)
+                    return
+                } 
+                        
+                let response = {
+                    success: 1,
+                    message: 'Updated email successfully',
+                    data: [{}]
                 }
+                res.json(response)
+                return
+
             }
         )
     }
@@ -434,28 +437,30 @@ export class UserController {
                         data: [{}]
                     }
                     res.status(500).json(response)
-                } else {
-                    if (result.affected == 0) {
-                        console.log(result.affected)
-                        let response = {
-                            success: Verify.USER_ID_DOES_NOT_EXIST,
-                            message:
-                                'Could not find the user with id ' +
-                                userId +
-                                ' or password already exist',
-                            data: [{}]
-                        }
-                        res.status(409).json(response)
-                    } else {
-                        console.log(result.affected)
-                        let response = {
-                            success: 1,
-                            message: 'Updated password successfully',
-                            data: [{}]
-                        }
-                        res.json(response)
+                    return
+                } 
+                
+                if (result.affected == 0) {
+                    console.log(result.affected)
+                    let response = {
+                        success: Verify.USER_ID_DOES_NOT_EXIST,
+                        message:
+                            'Could not find the user with id ' +
+                            userId +
+                            ' or password already exist',
+                        data: [{}]
                     }
+                    res.status(409).json(response)
+                    return
                 }
+                        
+                let response = {
+                    success: 1,
+                    message: 'Updated password successfully',
+                    data: [{}]
+                }
+                res.json(response)
+                return
             }
         )
     }
