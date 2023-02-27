@@ -5,8 +5,9 @@ import { User } from './entity/users'
 import { Category } from './entity/category'
 import { Menu } from './entity/menu'
 import { Token } from './entity/tokens'
+import path, { dirname } from 'path'
 
-dotenv.config()
+dotenv.config({ path: path.resolve(__dirname, '../../.env')})
 
 const rallyDataSource = new DataSource({
     type: 'mysql',
