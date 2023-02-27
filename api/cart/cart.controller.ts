@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { CartServices } from './cart.services'
 import BigNumber from 'bignumber.js'
 import { Cart } from '../../database/entity/carts'
+import { AuthorizationController } from '../../auth_middleware/authorization.contrloller'
 
 
 export class CartController{
@@ -53,6 +54,32 @@ export class CartController{
             }
            
         }
+
+        let token = req.get('authorization')!!
+        token = token.slice(7)
+
+        await AuthorizationController.tokenBelongsToUser(token, req.body.userId, (error?: any, result?: Boolean) => {
+            if(error){
+                let response = {
+                    success: 0,
+                    message: 'Failed to Verify if token belongs to user: Database Error',
+                    data: [{}]
+                }
+                res.status(500).json(response)
+                return
+            }
+
+            if(!result){
+
+                let response = {
+                    success: 0,
+                    message: 'Token does not belong to user',
+                    data: [{}]
+                }
+                res.status(401).json(response)
+                return
+            }
+        })
 
         await this.cartServices.getMenuItem(+req.body.menuId, async (err: any, menuItem: any) => {
             if(err){
@@ -111,6 +138,32 @@ export class CartController{
             return
         }
 
+        let token = req.get('authorization')!!
+        token = token.slice(7)
+
+        await AuthorizationController.tokenBelongsToUser(token, +req.body.userId, (error?: any, result?: Boolean) => {
+            if(error){
+                let response = {
+                    success: 0,
+                    message: 'Failed to Verify if token belongs to user: Database Error',
+                    data: [{}]
+                }
+                res.status(500).json(response)
+                return
+            }
+
+            if(!result){
+
+                let response = {
+                    success: 0,
+                    message: 'Token does not belong to user',
+                    data: [{}]
+                }
+                res.status(401).json(response)
+                return
+            }
+        })
+
         this.cartServices.getUsersCart(+req.params.userId, (err: any, result: any) => {
             if(err){
                 let response = {
@@ -134,6 +187,7 @@ export class CartController{
 
     public getCartItem = async (req: Request, res: Response) => {
 
+
         if(req.params.cartId == undefined) {
             let response = {
                 success: 0,
@@ -144,8 +198,15 @@ export class CartController{
             return
         }
 
-        this.cartServices.getCartItem(+req.params.cartId, (err: any, result: any) => {
+        let token = req.get('authorization')!!
+        token = token.slice(7)
+
+
+
+        this.cartServices.getCartItem(+req.params.cartId, async (err: any, result: any) => {
+
             if(err){
+
                 let response = {
                     success: 0,
                     message: 'Failed to fetch data from cart: Database Error',
@@ -154,6 +215,29 @@ export class CartController{
                 res.status(500).json(response)
                 return 
             }
+
+            await AuthorizationController.tokenBelongsToUser(token, result.user.id, (error?: any, result?: Boolean) => {
+                if(error){
+                    let response = {
+                        success: 0,
+                        message: 'Failed to Verify if token belongs to user: Database Error',
+                        data: [{}]
+                    }
+                    res.status(500).json(response)
+                    return
+                }
+    
+                if(!result){
+    
+                    let response = {
+                        success: 0,
+                        message: 'Token does not belong to user',
+                        data: [{}]
+                    }
+                    res.status(401).json(response)
+                    return
+                }
+            })
 
             let response = {
                 success: 1,
@@ -176,6 +260,44 @@ export class CartController{
             res.status(400).json(response)
             return
         }
+
+        await this.cartServices.getCartItem(+req.params.cartId, (err?: any, result?: any)=>{
+
+            if(err){
+                let response = {
+                    success: 0,
+                    message: 'Failed to fetch data from cart: Database Error',
+                    data: [{}]
+                }
+                res.status(500).json(response)
+                return 
+            }
+
+            let token = req.get('authorization')!!
+            token = token.slice(7)
+
+            AuthorizationController.tokenBelongsToUser(token, result.user.id, (error?: any, result?: Boolean) => {
+                if(error){
+                    let response = {
+                        success: 0,
+                        message: 'Failed to Verify if token belongs to user: Database Error',
+                        data: [{}]
+                    }
+                    res.status(500).json(response)
+                    return
+                }
+
+                if(!result){
+                    let response = {
+                        success: 0,
+                        message: 'Token does not belong to user',
+                        data: [{}]
+                    }
+                    res.status(401).json(response)
+                    return
+                }
+            })
+        })
 
         this.cartServices.deleteFromCart(+req.params.cartId, (err: any, result: any) => {
             if(err){

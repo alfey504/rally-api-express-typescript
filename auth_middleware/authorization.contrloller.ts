@@ -4,10 +4,13 @@ import * as dotenv from 'dotenv'
 import { getDataSource } from '../database/data_source'
 import { Token } from '../database/entity/tokens'
 import { Equal } from 'typeorm'
+import { UserController } from '../api/users/users.controller'
+import { UserServices } from '../api/users/users.services'
+import { AuthorizationServices } from './authorization.services'
 
 dotenv.config()
 
-export class VerifyToken {
+export class AuthorizationController {
     public static verifyToken = async (
         req: Request,
         res: Response,
@@ -29,7 +32,7 @@ export class VerifyToken {
                         }
                         res.status(401).json(response)
                     } else {
-                        if (await this.isTokenBlacklisted(token!)) {
+                        if (await AuthorizationServices.isTokenBlacklisted(token!)) {
                             next()
                         } else {
                             let response = {
@@ -53,20 +56,19 @@ export class VerifyToken {
         }
     }
 
-    private static isTokenBlacklisted = async (
-        token: string
-    ): Promise<Boolean> => {
-        try {
-            const rallyDataSource = getDataSource()
-            const rallyRepo = (await rallyDataSource).getRepository(Token)
-            const result = await rallyRepo.findOne({
-                where: {
-                    token: Equal(token)
-                }
-            })
-            return !result?.blackListed!
-        } catch (error) {
-            return false
-        }
+    public static tokenBelongsToUser = async ( 
+        token: String,
+        userId: number,
+        callback: (error?: any, result?: Boolean) => void
+    ) => {
+
+        AuthorizationServices.doesTokenBelongToUser(token, userId, (error?: any, result?: Boolean) => {
+            if(error){
+                callback(error)
+            }else{
+                callback(null, result)
+            }
+        })
     }
+
 }
