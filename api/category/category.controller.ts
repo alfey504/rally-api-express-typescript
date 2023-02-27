@@ -93,7 +93,7 @@ export class CategoryController {
 
                 let response = {
                     success: 1,
-                    message: 'Fetched Category successfyully',
+                    message: 'Fetched Category successfully',
                     data: [result]
                 }
                 res.json(response)
@@ -125,7 +125,7 @@ export class CategoryController {
 
                 let response = {
                     success: 1,
-                    message: 'Deleted Category successfyully',
+                    message: 'Deleted Category successfully',
                     data: [result]
                 }
                 res.json(response)
