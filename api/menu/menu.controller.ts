@@ -125,7 +125,7 @@ export class MenuController {
         menuItem.name = req.body.name
         menuItem.description = req.body.description
         menuItem.price = req.body.price
-        menuItem.category = req.body.category
+        menuItem.category = req.body.categoryId
 
         await this.menuServices.addMenu(menuItem, (err: any, result: any) => {
             if (err) {
