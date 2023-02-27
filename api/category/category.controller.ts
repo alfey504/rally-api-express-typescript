@@ -125,6 +125,7 @@ export class CategoryController {
         await this.categoryServices.deleteCategory(
             +req.params.id,
             (err: any, result: any) => {
+                
                 if (err) {
                     let response = {
                         success: 0,
@@ -132,6 +133,15 @@ export class CategoryController {
                         data: [{}]
                     }
                     res.status(500).json(response)
+                }
+                
+                if(result.affected == 0){
+                    let response = {
+                        success: 0,
+                        message: 'Category with id:' + req.params.id + ' does not exist',
+                        data: [{}]
+                    }
+                    res.status(404).json(response)
                 }
 
                 let response = {
