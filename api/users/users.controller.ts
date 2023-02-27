@@ -6,6 +6,7 @@ import { sign } from 'jsonwebtoken'
 import * as dotenv from 'dotenv'
 import { Verify } from './users.verification'
 import { Token } from '../../database/entity/tokens'
+import { AuthorizationController } from '../../auth_middleware/authorization.controller'
 
 dotenv.config()
 
@@ -278,6 +279,30 @@ export class UserController {
             return
         }
 
+        let token = req.get('authorization')!!
+        token = token.slice(7)
+        AuthorizationController.tokenBelongsToUser(token, +req.body.userId, (err?: any, result?: Boolean) => {
+            if(err){
+                let response = {
+                    success: 0,
+                    message: 'Failed to Verify if token belongs to user: Database Error',
+                    data: [{}]
+                }
+                res.status(500).json(response)
+                return
+            }
+            if(!result){
+
+                let response = {
+                    success: 0,
+                    message: 'Token does not belong to user',
+                    data: [{}]
+                }
+                res.status(401).json(response)
+                return
+            }
+        })
+
         this.userServices.updateUserName(
             userName,
             userId,
@@ -355,6 +380,30 @@ export class UserController {
             return
         }
 
+        let token = req.get('authorization')!!
+        token = token.slice(7)
+        AuthorizationController.tokenBelongsToUser(token, +req.body.userId, (err?: any, result?: Boolean) => {
+            if(err){
+                let response = {
+                    success: 0,
+                    message: 'Failed to Verify if token belongs to user: Database Error',
+                    data: [{}]
+                }
+                res.status(500).json(response)
+                return
+            }
+            if(!result){
+
+                let response = {
+                    success: 0,
+                    message: 'Token does not belong to user',
+                    data: [{}]
+                }
+                res.status(401).json(response)
+                return
+            }
+        })
+
         this.userServices.updateEmail(
             email,
             userId,
@@ -424,6 +473,30 @@ export class UserController {
             res.status(400).json(response)
             return
         }
+
+        let token = req.get('authorization')!!
+        token = token.slice(7)
+        AuthorizationController.tokenBelongsToUser(token, +req.body.userId, (err?: any, result?: Boolean) => {
+            if(err){
+                let response = {
+                    success: 0,
+                    message: 'Failed to Verify if token belongs to user: Database Error',
+                    data: [{}]
+                }
+                res.status(500).json(response)
+                return
+            }
+            if(!result){
+
+                let response = {
+                    success: 0,
+                    message: 'Token does not belong to user',
+                    data: [{}]
+                }
+                res.status(401).json(response)
+                return
+            }
+        })
 
         this.userServices.updatePassword(
             password,
