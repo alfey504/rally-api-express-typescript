@@ -1,4 +1,4 @@
-import { CategoryServices } from './catergory.services'
+import { CategoryServices } from './category.services'
 import { Request, Response } from 'express'
 import { Category } from '../../database/entity/category'
 import { AnyMxRecord } from 'dns'
@@ -15,7 +15,7 @@ export class CategoryController {
             if (err) {
                 let response = {
                     success: 0,
-                    message: 'Failed to fecth the categories: Database Error',
+                    message: 'Failed to fetch the categories: Database Error',
                     data: [{}]
                 }
                 res.json(response)
@@ -24,7 +24,7 @@ export class CategoryController {
 
             let response = {
                 success: 1,
-                message: 'Sucessfully fetched all data',
+                message: 'Successfully fetched all data',
                 data: result
             }
             res.json(response)
@@ -44,7 +44,7 @@ export class CategoryController {
 
         let category = new Category()
         category.category = req.body.category
-        await this.categoryServices.addCategoy(
+        await this.categoryServices.addCategory(
             category,
             (err: any, result: any) => {
                 if (err) {

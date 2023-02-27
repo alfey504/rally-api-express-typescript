@@ -23,7 +23,7 @@ rallyDataSource
     .initialize()
     .then(async () => {
         console.log(
-            'connection is initilized  with rally ' + process.env.DB_NAME
+            'connection is initialized  with rally ' + process.env.DB_NAME
         )
         rallyDataSource.synchronize()
     })

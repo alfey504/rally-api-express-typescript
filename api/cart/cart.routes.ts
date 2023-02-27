@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { AuthorizationController } from '../../auth_middleware/authorization.contrloller'
+import { AuthorizationController } from '../../auth_middleware/authorization.controller'
 import { CartController } from './cart.controller'
 
 export const menuRouter = Router()

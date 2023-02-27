@@ -7,13 +7,13 @@ export class Verify {
     public static USER_EMAIL_ALREADY_EXISTS: number = 102
     
     public static USER_USERNAME_DOES_NOT_EXIST: number = 201
-    public static USER_INCORECT_PASSWORD: number = 202
+    public static USER_INCORRECT_PASSWORD: number = 202
     public static USER_ID_DOES_NOT_EXIST: number = 200
 
-    private userSevices: UserServices
+    private userServices: UserServices
 
     constructor() {
-        this.userSevices = new UserServices()
+        this.userServices = new UserServices()
     }
 
     // check if email already exist in the database
@@ -33,7 +33,7 @@ export class Verify {
             }
         }
 
-        await this.userSevices.getUserByEmail(email, callback)
+        await this.userServices.getUserByEmail(email, callback)
         return exist!
     }
 
@@ -52,7 +52,7 @@ export class Verify {
                 exist = true
             }
         }
-        await this.userSevices.getUserByUserName(userName, callback)
+        await this.userServices.getUserByUserName(userName, callback)
         return exist!
     }
 

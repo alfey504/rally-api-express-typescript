@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { UserController } from './users.controller'
-import { AuthorizationController } from '../../auth_middleware/authorization.contrloller'
+import { AuthorizationController } from '../../auth_middleware/authorization.controller'
 
 export const usersRoute = Router()
 
@@ -20,17 +20,17 @@ usersRoute.post('/register', userController.registerUser)
 // login a user
 usersRoute.post('/login', userController.loginUser)
 
-// chnage username for userid
+// change username for userId
 usersRoute.put(
     '/username',
     AuthorizationController.verifyToken,
     userController.changeUserName
 )
 
-//  change email for userid
+//  change email for userId
 usersRoute.put('/email', AuthorizationController.verifyToken, userController.changeEmail)
 
-//  change password for userid
+//  change password for userId
 usersRoute.put(
     '/password',
     AuthorizationController.verifyToken,

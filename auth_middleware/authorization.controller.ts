@@ -26,8 +26,8 @@ export class AuthorizationController {
                     if (err) {
                         console.log('invalid token')
                         let response = {
-                            sucess: 0,
-                            message: 'Invaild Token',
+                            success: 0,
+                            message: 'Invalid Token',
                             data: [{}]
                         }
                         res.status(401).json(response)
@@ -36,8 +36,8 @@ export class AuthorizationController {
                             next()
                         } else {
                             let response = {
-                                sucess: 0,
-                                message: 'Invaild Token',
+                                success: 0,
+                                message: 'Invalid Token',
                                 data: [{}]
                             }
                             res.status(401).json(response)
@@ -48,7 +48,7 @@ export class AuthorizationController {
         } else {
             console.log('token does not exist')
             let response = {
-                sucess: 0,
+                success: 0,
                 message: 'Access denied! make sure you have a token',
                 data: [{}]
             }

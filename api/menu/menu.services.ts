@@ -21,7 +21,7 @@ export class MenuServices {
     }
 
     public getMenuByCategory = async (
-        categoryid: number,
+        categoryId: number,
         callback: (err?: any, result?: any) => void
     ) => {
         try {
@@ -32,7 +32,7 @@ export class MenuServices {
                     category: true
                 },
                 where: {
-                    category: Equal(categoryid)
+                    category: Equal(categoryId)
                 }
             })
             callback(null, result)

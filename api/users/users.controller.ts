@@ -19,7 +19,7 @@ export class UserController {
     }
 
     // function to handle the /register endpoint
-    // verify the data in the requeat and use service to add data to the database
+    // verify the data in the request and use service to add data to the database
     public registerUser = async (req: Request, res: Response) => {
         // verifying the data
         if (req.body.fullName == undefined || this.verify.isStringEmpty(req.body.fullName)) {
@@ -137,7 +137,7 @@ export class UserController {
     }
 
     // function to handle the /login endpoint
-    // verify the data in the requeat and use service to verify the password and genrate and start a session
+    // verify the data in the request and use service to verify the password and generate and start a session
     public loginUser = async (req: Request, res: Response) => {
         const userName = req.body.userName
         const password = req.body.password
@@ -145,7 +145,7 @@ export class UserController {
         if (req.body.userName == undefined) {
             let response = {
                 success: 0,
-                message: 'miisging parameter {userName:}',
+                message: 'missing parameter {userName:}',
                 data: [{}]
             }
             res.status(400).json(response)
@@ -186,7 +186,7 @@ export class UserController {
 
                 if (!compareSync(password, result.password)) {
                     let response = {
-                        success: Verify.USER_INCORECT_PASSWORD,
+                        success: Verify.USER_INCORRECT_PASSWORD,
                         message: 'Login failed incorrect password',
                         data: [{}]
                     }
@@ -216,7 +216,7 @@ export class UserController {
                             let response = {
                                 success: 0,
                                 message:
-                                    'Could not genarate token : Databse error',
+                                    'Could not generate token : Database error',
                                 data: [{}]
                             }
                             res.status(500).json(response)
@@ -225,7 +225,7 @@ export class UserController {
 
                         let response = {
                             success: 1,
-                            message: 'Login sucessful',
+                            message: 'Login successful',
                             data: [
                                 {
                                     userId: result.id,
@@ -243,7 +243,7 @@ export class UserController {
     }
 
     // function to handle the /username :PUT endpoint
-    // verify the data in the requeat and use service to verify the password and genrate a token and start a session
+    // verify the data in the request and use service to verify the password and generate a token and start a session
     public changeUserName = async (req: Request, res: Response) => {
         let userName = req.body.userName
         let userId = req.body.userId

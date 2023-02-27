@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { CartServices } from './cart.services'
 import BigNumber from 'bignumber.js'
 import { Cart } from '../../database/entity/carts'
-import { AuthorizationController } from '../../auth_middleware/authorization.contrloller'
+import { AuthorizationController } from '../../auth_middleware/authorization.controller'
 
 
 export class CartController{
@@ -37,7 +37,7 @@ export class CartController{
             return
         }
 
-        if(req.body.quatntiy != undefined){
+        if(req.body.quantity != undefined){
             try{
 
                 quantity = +req.body.quantity
@@ -82,6 +82,7 @@ export class CartController{
         })
 
         await this.cartServices.getMenuItem(+req.body.menuId, async (err: any, menuItem: any) => {
+            
             if(err){
                 let response = {
                     success: 0,

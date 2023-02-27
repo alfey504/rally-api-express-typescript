@@ -33,7 +33,7 @@ export class CategoryServices {
         }
     }
 
-    public addCategoy = async (
+    public addCategory = async (
         category: Category,
         callback: (error?: any, result?: any) => void
     ) => {

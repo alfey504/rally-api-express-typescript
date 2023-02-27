@@ -36,7 +36,7 @@ export class MenuController {
         if (req.params.categoryId == undefined) {
             let response = {
                 success: 0,
-                message: 'missing parameter {caterogryId:}',
+                message: 'missing parameter {categoryId:}',
                 data: [{}]
             }
             res.json(response)
@@ -72,7 +72,7 @@ export class MenuController {
         if (req.body.name == undefined) {
             let response = {
                 success: 0,
-                message: 'Request missing parametr {name:}',
+                message: 'Request missing parameter {name:}',
                 data: [{}]
             }
             res.json(response)
@@ -82,7 +82,7 @@ export class MenuController {
         if (req.body.description == undefined) {
             let response = {
                 success: 0,
-                message: 'Request missing parametr {description:}',
+                message: 'Request missing parameter {description:}',
                 data: [{}]
             }
             res.json(response)
@@ -92,7 +92,7 @@ export class MenuController {
         if (req.body.price == undefined) {
             let response = {
                 success: 0,
-                message: 'Request missing parametr {price:}',
+                message: 'Request missing parameter {price:}',
                 data: [{}]
             }
             res.json(response)
@@ -102,7 +102,7 @@ export class MenuController {
         if (req.body.categoryId == undefined) {
             let response = {
                 success: 0,
-                message: 'Request missing parametr {categoryId:}',
+                message: 'Request missing parameter {categoryId:}',
                 data: [{}]
             }
             res.json(response)
@@ -141,7 +141,7 @@ export class MenuController {
         if (req.params.id == undefined) {
             let response = {
                 success: 0,
-                message: 'Request missing parametr {id:}',
+                message: 'Request missing parameter {id:}',
                 data: [{}]
             }
             res.json(response)
