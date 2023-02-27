@@ -18,7 +18,7 @@ export class CategoryController {
                     message: 'Failed to fetch the categories: Database Error',
                     data: [{}]
                 }
-                res.json(response)
+                res.status(500).json(response)
                 return
             }
 
@@ -38,7 +38,7 @@ export class CategoryController {
                 message: 'parameter {category:} missing in request body',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
             return
         }
 
@@ -53,7 +53,7 @@ export class CategoryController {
                         message: 'Failed to add category: Database Error',
                         data: [{}]
                     }
-                    res.json(response)
+                    res.status(500).json(response)
                     return
                 }
 
@@ -74,7 +74,7 @@ export class CategoryController {
                 message: 'Id not given in the request',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
             return
         }
 
@@ -87,7 +87,17 @@ export class CategoryController {
                         message: 'Failed to get category: Database Error',
                         data: [{}]
                     }
-                    res.json(response)
+                    res.status(500).json(response)
+                    return
+                }
+
+                if(result == null){
+                    let response = {
+                        success: 0,
+                        message: 'does not have category with {id: ' + +req.params.id + '}',
+                        data: [{}]
+                    }
+                    res.status(404).json(response)
                     return
                 }
 
@@ -108,7 +118,7 @@ export class CategoryController {
                 message: 'Id not given in the request',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
             return
         }
 
@@ -121,6 +131,7 @@ export class CategoryController {
                         message: 'Failed to delete category: Database error',
                         data: [{}]
                     }
+                    res.status(500).json(response)
                 }
 
                 let response = {
