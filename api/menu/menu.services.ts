@@ -22,7 +22,7 @@ export class MenuServices {
 
     public getMenuByCategory = async (
         categoryId: number,
-        callback: (err?: any, result?: any) => void
+        callback: (err?: any, result?: Array<Menu>) => void
     ) => {
         try {
             const rallyDataSource = getDataSource()

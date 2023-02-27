@@ -18,7 +18,7 @@ export class MenuController {
                     message: 'Failed to get all the menu items: Database Error',
                     data: [{}]
                 }
-                res.json(response)
+                res.status(500).json(response)
                 return
             }
 
@@ -39,13 +39,13 @@ export class MenuController {
                 message: 'missing parameter {categoryId:}',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
             return
         }
 
         await this.menuServices.getMenuByCategory(
             +req.params.categoryId,
-            (err: any, result: any) => {
+            (err?: any, result?: Array<Menu>) => {
                 if (err) {
                     let response = {
                         success: 0,
@@ -53,7 +53,19 @@ export class MenuController {
                             'Failed to get all the menu items: Database Error',
                         data: [{}]
                     }
-                    res.json(response)
+                    res.status(500).json(response)
+                    return
+                }
+
+                if(result!!.length == 0){
+                    
+                    let response = {
+                        success: 0,
+                        message:
+                            'There are no menu items in category {categoryId: '+ req.params.categoryId +'}',
+                        data: [{}]
+                    }
+                    res.status(404).json(response)
                     return
                 }
 
@@ -75,7 +87,7 @@ export class MenuController {
                 message: 'Request missing parameter {name:}',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
             return
         }
 
@@ -85,7 +97,7 @@ export class MenuController {
                 message: 'Request missing parameter {description:}',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
             return
         }
 
@@ -95,7 +107,7 @@ export class MenuController {
                 message: 'Request missing parameter {price:}',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
             return
         }
 
@@ -105,7 +117,7 @@ export class MenuController {
                 message: 'Request missing parameter {categoryId:}',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
             return
         }
 
@@ -123,7 +135,7 @@ export class MenuController {
                     data: [{}]
                 }
                 console.log(err)
-                res.json(response)
+                res.status(500).json(response)
                 return
             }
 
@@ -144,7 +156,7 @@ export class MenuController {
                 message: 'Request missing parameter {id:}',
                 data: [{}]
             }
-            res.json(response)
+            res.status(400).json(response)
             return
         }
 
@@ -157,7 +169,7 @@ export class MenuController {
                         message: 'Failed to remove menu item',
                         data: [{}]
                     }
-                    res.json(response)
+                    res.status(500).json(response)
                     return
                 }
 
@@ -181,7 +193,7 @@ export class MenuController {
                         message: 'Failed to remove menu item',
                         data: [{}]
                     }
-                    res.json(response)
+                    res.status(500).json(response)
                     return
                 }
 
