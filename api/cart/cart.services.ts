@@ -14,10 +14,7 @@ export class CartServices{
             const rallyDataSource = getDataSource()
             const rallyRepo = (await rallyDataSource).getRepository(Cart)
             const result = await rallyRepo.find({
-                relations: {
-                    user: true,
-                    menu: true
-                },
+                relations: ['user', 'menu', 'menu.category'],
                 where: {
                     user: Equal(userId)
                 }
@@ -37,6 +34,7 @@ export class CartServices{
             const rallyDataSource = getDataSource()
             const rallyRepo = (await rallyDataSource).getRepository(Cart)
             const result = await rallyRepo.findOne({
+                relations: ['user', 'menu', 'menu.category'],
                 where: {
                     id: Equal(cartId)
                 }

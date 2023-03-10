@@ -19,7 +19,7 @@ export class Cart {
 
     @ManyToOne((type) => Menu)
     @JoinColumn()
-    menu!: User
+    menu!: Menu
 
     @Column({ nullable: false })
     quantity?: number

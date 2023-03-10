@@ -4,6 +4,7 @@ import { usersRoute, logUserEndPoints } from './api/users/users.router'
 import 'reflect-metadata'
 import { categoryRouter } from './api/category/category.routes'
 import { menuRouter } from './api/menu/menu.routes'
+import { cartRouter } from './api/cart/cart.routes'
 
 dotenv.config()
 
@@ -14,6 +15,7 @@ const port = process.env.PORT || '8000'
 app.use('/api/users', usersRoute)
 app.use('/api/category', categoryRouter) 
 app.use('/api/menu', menuRouter) 
+app.use('/api/cart', cartRouter) 
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Home')
