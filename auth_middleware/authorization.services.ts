@@ -10,24 +10,32 @@ export class AuthorizationServices{
         token: String,
         userId: number,
         callback: (error?: any, result?: any) => void
-    ) => {
+    ): Promise<Boolean | undefined> => {
 
         try {
             const rallyDataSource = getDataSource()
             const rallyRepo = (await rallyDataSource).getRepository(Token)
             const result = await rallyRepo.findOne({
+                relations: {
+                    user: true
+                },
                 where: {
                     token: Equal(token)
                 }
             })
+            console.log('Authorization Services -> doesTokenBelongToUser > Result: ' , result)
 
             if(result!!.user.id == userId){
                 callback(null, true)
+                return true
             }else{
                 callback(null, false)
+                return false
             }
+            
         } catch (error) {
             callback(error)
+            return undefined
         }
     }
 

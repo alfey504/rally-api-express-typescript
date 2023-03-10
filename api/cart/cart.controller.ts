@@ -58,7 +58,7 @@ export class CartController{
         let token = req.get('authorization')!!
         token = token.slice(7)
 
-        await AuthorizationController.tokenBelongsToUser(token, req.body.userId, (error?: any, result?: Boolean) => {
+        let doesTokenBelongToUser = await AuthorizationController.tokenBelongsToUser(token, req.body.userId, (error?: any, result?: Boolean) => {
             if(error){
                 let response = {
                     success: 0,
@@ -77,9 +77,11 @@ export class CartController{
                     data: [{}]
                 }
                 res.status(401).json(response)
-                return
+                return 
             }
         })
+
+        if(doesTokenBelongToUser == undefined) return
 
         await this.cartServices.getMenuItem(+req.body.menuId, async (err: any, menuItem: any) => {
             
@@ -142,7 +144,7 @@ export class CartController{
         let token = req.get('authorization')!!
         token = token.slice(7)
 
-        await AuthorizationController.tokenBelongsToUser(token, +req.body.userId, (error?: any, result?: Boolean) => {
+        let doesTokenBelongToUser = await AuthorizationController.tokenBelongsToUser(token, +req.body.userId, (error?: any, result?: Boolean) => {
             if(error){
                 let response = {
                     success: 0,
@@ -164,6 +166,8 @@ export class CartController{
                 return
             }
         })
+
+        if(doesTokenBelongToUser == undefined) return
 
         this.cartServices.getUsersCart(+req.params.userId, (err: any, result: any) => {
             if(err){
@@ -217,7 +221,7 @@ export class CartController{
                 return 
             }
 
-            await AuthorizationController.tokenBelongsToUser(token, result.user.id, (error?: any, result?: Boolean) => {
+            let doesTokenBelongToUser = await AuthorizationController.tokenBelongsToUser(token, result.user.id, (error?: any, result?: Boolean) => {
                 if(error){
                     let response = {
                         success: 0,
@@ -239,6 +243,8 @@ export class CartController{
                     return
                 }
             })
+
+            if(doesTokenBelongToUser == undefined) return
 
             let response = {
                 success: 1,
@@ -262,8 +268,7 @@ export class CartController{
             return
         }
 
-        await this.cartServices.getCartItem(+req.params.cartId, (err?: any, result?: any)=>{
-
+        await this.cartServices.getCartItem(+req.params.cartId, async (err?: any, result?: any)=>{
             if(err){
                 let response = {
                     success: 0,
@@ -276,8 +281,7 @@ export class CartController{
 
             let token = req.get('authorization')!!
             token = token.slice(7)
-
-            AuthorizationController.tokenBelongsToUser(token, result.user.id, (error?: any, result?: Boolean) => {
+            let doesTokenBelongToUser = await AuthorizationController.tokenBelongsToUser(token, result.user.id, (error?: any, isTokenUsersToken?: Boolean) => {
                 if(error){
                     let response = {
                         success: 0,
@@ -287,8 +291,7 @@ export class CartController{
                     res.status(500).json(response)
                     return
                 }
-
-                if(!result){
+                if(!isTokenUsersToken){
                     let response = {
                         success: 0,
                         message: 'Token does not belong to user',
@@ -297,7 +300,14 @@ export class CartController{
                     res.status(401).json(response)
                     return
                 }
+                let response = {
+                    success: 1,
+                    message: 'successfully fetched data from database',
+                    data: [result]
+                }
+                res.json(response)
             })
+
         })
 
         this.cartServices.deleteFromCart(+req.params.cartId, (err: any, result: any) => {
@@ -310,7 +320,6 @@ export class CartController{
                 res.status(500).json(response)
                 return 
             }
-
             let response = {
                 success: 1,
                 message: 'Successfully deleted data from database',

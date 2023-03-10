@@ -60,15 +60,17 @@ export class AuthorizationController {
         token: String,
         userId: number,
         callback: (error?: any, result?: Boolean) => void
-    ) => {
+    ): Promise<Boolean | undefined>  => {
 
-        AuthorizationServices.doesTokenBelongToUser(token, userId, (error?: any, result?: Boolean) => {
+        let result = await AuthorizationServices.doesTokenBelongToUser(token, userId, (error?: any, result?: Boolean) => {
             if(error){
                 callback(error)
+                console.log('AuthorizationServices-> TokenBelongsToUser -> Error: ' + error.toString())
             }else{
                 callback(null, result)
             }
         })
+        return result
     }
 
 }

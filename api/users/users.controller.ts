@@ -255,7 +255,7 @@ export class UserController {
                 message: 'missing parameter {userName:}',
                 data: [{}]
             }
-            res.status(400).json()
+            res.status(400).json(response)
             return
         } 
 
@@ -265,7 +265,7 @@ export class UserController {
                 message: 'Username already exists',
                 data: [{}]
             }
-            res.status(409).json()
+            res.status(409).json(response)
             return
         }
 
@@ -281,7 +281,7 @@ export class UserController {
 
         let token = req.get('authorization')!!
         token = token.slice(7)
-        AuthorizationController.tokenBelongsToUser(token, +req.body.userId, (err?: any, result?: Boolean) => {
+        let result = AuthorizationController.tokenBelongsToUser(token, +req.body.userId, (err?: any, result?: Boolean) => {
             if(err){
                 let response = {
                     success: 0,
@@ -302,6 +302,8 @@ export class UserController {
                 return
             }
         })
+
+        if(result == undefined) return
 
         this.userServices.updateUserName(
             userName,
@@ -382,7 +384,7 @@ export class UserController {
 
         let token = req.get('authorization')!!
         token = token.slice(7)
-        AuthorizationController.tokenBelongsToUser(token, +req.body.userId, (err?: any, result?: Boolean) => {
+        let result = AuthorizationController.tokenBelongsToUser(token, +req.body.userId, (err?: any, result?: Boolean) => {
             if(err){
                 let response = {
                     success: 0,
@@ -403,6 +405,8 @@ export class UserController {
                 return
             }
         })
+
+        if(result == undefined) return
 
         this.userServices.updateEmail(
             email,
@@ -476,7 +480,7 @@ export class UserController {
 
         let token = req.get('authorization')!!
         token = token.slice(7)
-        AuthorizationController.tokenBelongsToUser(token, +req.body.userId, (err?: any, result?: Boolean) => {
+        let result = AuthorizationController.tokenBelongsToUser(token, +req.body.userId, (err?: any, result?: Boolean) => {
             if(err){
                 let response = {
                     success: 0,
@@ -497,6 +501,8 @@ export class UserController {
                 return
             }
         })
+
+        if(result == undefined) return
 
         this.userServices.updatePassword(
             password,
