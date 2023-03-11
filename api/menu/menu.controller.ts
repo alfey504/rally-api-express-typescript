@@ -16,7 +16,7 @@ export class MenuController {
                 let response = {
                     success: 0,
                     message: 'Failed to get all the menu items: Database Error',
-                    data: [{}]
+                    data: []
                 }
                 res.status(500).json(response)
                 return
@@ -37,7 +37,7 @@ export class MenuController {
             let response = {
                 success: 0,
                 message: 'missing parameter {categoryId:}',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -51,7 +51,7 @@ export class MenuController {
                         success: 0,
                         message:
                             'Failed to get all the menu items: Database Error',
-                        data: [{}]
+                        data: []
                     }
                     res.status(500).json(response)
                     return
@@ -63,7 +63,7 @@ export class MenuController {
                         success: 0,
                         message:
                             'There are no menu items in category {categoryId: '+ req.params.categoryId +'}',
-                        data: [{}]
+                        data: []
                     }
                     res.status(404).json(response)
                     return
@@ -85,7 +85,7 @@ export class MenuController {
             let response = {
                 success: 0,
                 message: 'Request missing parameter {name:}',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -95,7 +95,7 @@ export class MenuController {
             let response = {
                 success: 0,
                 message: 'Request missing parameter {description:}',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -105,7 +105,7 @@ export class MenuController {
             let response = {
                 success: 0,
                 message: 'Request missing parameter {price:}',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -115,7 +115,7 @@ export class MenuController {
             let response = {
                 success: 0,
                 message: 'Request missing parameter {categoryId:}',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -132,7 +132,7 @@ export class MenuController {
                 let response = {
                     success: 0,
                     message: 'Failed to add menu item: Database Error',
-                    data: [{}]
+                    data: []
                 }
                 console.log(err)
                 res.status(500).json(response)
@@ -154,7 +154,7 @@ export class MenuController {
             let response = {
                 success: 0,
                 message: 'Request missing parameter {id:}',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -167,7 +167,7 @@ export class MenuController {
                     let response = {
                         success: 0,
                         message: 'Failed to remove menu item',
-                        data: [{}]
+                        data: []
                     }
                     res.status(500).json(response)
                     return
@@ -191,7 +191,7 @@ export class MenuController {
                     let response = {
                         success: 0,
                         message: 'Failed to remove menu item',
-                        data: [{}]
+                        data: []
                     }
                     res.status(500).json(response)
                     return

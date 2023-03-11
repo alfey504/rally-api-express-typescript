@@ -16,7 +16,7 @@ export class CategoryController {
                 let response = {
                     success: 0,
                     message: 'Failed to fetch the categories: Database Error',
-                    data: [{}]
+                    data: []
                 }
                 res.status(500).json(response)
                 return
@@ -36,7 +36,7 @@ export class CategoryController {
             let response = {
                 success: 0,
                 message: 'parameter {category:} missing in request body',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -51,7 +51,7 @@ export class CategoryController {
                     let response = {
                         success: 0,
                         message: 'Failed to add category: Database Error',
-                        data: [{}]
+                        data: []
                     }
                     res.status(500).json(response)
                     return
@@ -72,7 +72,7 @@ export class CategoryController {
             let response = {
                 success: 0,
                 message: 'Id not given in the request',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -85,7 +85,7 @@ export class CategoryController {
                     let response = {
                         success: 0,
                         message: 'Failed to get category: Database Error',
-                        data: [{}]
+                        data: []
                     }
                     res.status(500).json(response)
                     return
@@ -95,7 +95,7 @@ export class CategoryController {
                     let response = {
                         success: 0,
                         message: 'does not have category with {id: ' + +req.params.id + '}',
-                        data: [{}]
+                        data: []
                     }
                     res.status(404).json(response)
                     return
@@ -116,7 +116,7 @@ export class CategoryController {
             let response = {
                 success: 0,
                 message: 'Id not given in the request',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -130,7 +130,7 @@ export class CategoryController {
                     let response = {
                         success: 0,
                         message: 'Failed to delete category: Database error',
-                        data: [{}]
+                        data: []
                     }
                     res.status(500).json(response)
                 }
@@ -139,7 +139,7 @@ export class CategoryController {
                     let response = {
                         success: 0,
                         message: 'Category with id:' + req.params.id + ' does not exist',
-                        data: [{}]
+                        data: []
                     }
                     res.status(404).json(response)
                 }
