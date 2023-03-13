@@ -1,6 +1,7 @@
 import { getDataSource } from '../../database/data_source'
 import { Menu } from '../../database/entity/menu'
-import { Equal } from 'typeorm'
+import { Equal, ILike } from 'typeorm'
+import { Category } from '../../database/entity/category'
 
 export class MenuServices {
     
@@ -20,6 +21,29 @@ export class MenuServices {
         }
     }
 
+    public searchMenu = async (
+        search: String, 
+        callback: (err?: any, result?: any) => void
+    ) => {
+
+        try {
+            const rallyDataSource = getDataSource()
+            const rallyRepo = (await rallyDataSource).getRepository(Menu)
+            const result = await rallyRepo.find({
+                relations: {
+                    category: true
+                },
+                where: {
+                    name: ILike('%' + search + '%')
+                }
+            })
+            callback(null, result)
+        } catch (error) {
+            
+            callback(error)
+        }
+    }
+    
     public getMenuByCategory = async (
         categoryId: number,
         callback: (err?: any, result?: Array<Menu>) => void

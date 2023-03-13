@@ -27,7 +27,7 @@ export class UserController {
             res.status(400).json({
                 success: 0,
                 message: 'missing parameter {fullName:}',
-                data: [{}]
+                data: []
             })
             return
         }
@@ -36,7 +36,7 @@ export class UserController {
             res.status(400).json({
                 success: 0,
                 message: 'missing parameter {email:}',
-                data: [{}]
+                data: []
             })
             return
         }
@@ -45,7 +45,7 @@ export class UserController {
             res.status(409).json({
                 success: Verify.USER_EMAIL_ALREADY_EXISTS,
                 message: 'Email already exists',
-                data: [{}]
+                data: []
             })
             return
         }
@@ -54,7 +54,7 @@ export class UserController {
             res.status(400).json({
                 success: 0,
                 message: 'missing parameter {userName:}',
-                data: [{}]
+                data: []
             })
             return
         }
@@ -63,7 +63,7 @@ export class UserController {
             res.status(409).json({
                 success: Verify.USER_USERNAME_ALREADY_EXISTS,
                 message: 'Username already exists',
-                data: [{}]
+                data: []
             })
             return
         }
@@ -72,7 +72,7 @@ export class UserController {
             res.status(400).json({
                 success: 0,
                 message: 'missing parameter {password:}',
-                data: [{}]
+                data: []
             })
             return
         }
@@ -95,7 +95,7 @@ export class UserController {
                         success: 0,
                         message:
                             'DATABASE ERROR: failed to add user to data base',
-                        data: [{}]
+                        data: []
                     }
                     res.status(500).json(response)
                     return
@@ -107,7 +107,7 @@ export class UserController {
                         success: 0,
                         message:
                             'DATABASE ERROR: failed to add user to data base',
-                        data: [{}]
+                        data: []
                     }
                     res.status(500).json(response)
                     return
@@ -130,7 +130,7 @@ export class UserController {
             let response = {
                 success: 0,
                 message: 'DATABASE ERROR: failed to add user to data base',
-                data: [{}]
+                data: []
             }
 
             res.status(500).json(response)
@@ -147,7 +147,7 @@ export class UserController {
             let response = {
                 success: 0,
                 message: 'missing parameter {userName:}',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -157,7 +157,7 @@ export class UserController {
             let response = {
                 success: 0,
                 message: 'missing parameter {password:}',
-                data: [{}]
+                data: []
             }
             res.status(400).json()
             return
@@ -170,7 +170,7 @@ export class UserController {
                     let response = {
                         success: 0,
                         message: 'Login failed database error',
-                        data: [{}]
+                        data: []
                     }
                     res.status(500).json(response)
                 }
@@ -179,7 +179,7 @@ export class UserController {
                     let response = {
                         success: Verify.USER_USERNAME_DOES_NOT_EXIST,
                         message: 'Login failed user does not exist',
-                        data: [{}]
+                        data: []
                     }
                     res.json(response)
                     return
@@ -189,7 +189,7 @@ export class UserController {
                     let response = {
                         success: Verify.USER_INCORRECT_PASSWORD,
                         message: 'Login failed incorrect password',
-                        data: [{}]
+                        data: []
                     }
                     res.json(response)
                     return
@@ -218,7 +218,7 @@ export class UserController {
                                 success: 0,
                                 message:
                                     'Could not generate token : Database error',
-                                data: [{}]
+                                data: []
                             }
                             res.status(500).json(response)
                             return
@@ -253,7 +253,7 @@ export class UserController {
             let response = {
                 success: 0,
                 message: 'missing parameter {userName:}',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -263,7 +263,7 @@ export class UserController {
             let response = {
                 success: Verify.USER_USERNAME_ALREADY_EXISTS,
                 message: 'Username already exists',
-                data: [{}]
+                data: []
             }
             res.status(409).json(response)
             return
@@ -273,7 +273,7 @@ export class UserController {
             let response = {
                 success: 0,
                 message: 'missing parameter {id:}',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -286,7 +286,7 @@ export class UserController {
                 let response = {
                     success: 0,
                     message: 'Failed to Verify if token belongs to user: Database Error',
-                    data: [{}]
+                    data: []
                 }
                 res.status(500).json(response)
                 return
@@ -296,7 +296,7 @@ export class UserController {
                 let response = {
                     success: 0,
                     message: 'Token does not belong to user',
-                    data: [{}]
+                    data: []
                 }
                 res.status(401).json(response)
                 return
@@ -314,7 +314,7 @@ export class UserController {
                     let response = {
                         success: 0,
                         message: 'DATABASE ERROR: failed to update username',
-                        data: [{}]
+                        data: []
                     }
                     res.status(500).json(response)
                     return
@@ -328,7 +328,7 @@ export class UserController {
                             'Could not find the user with ' +
                             userId +
                             ' or username already exist',
-                        data: [{}]
+                        data: []
                     }
                     res.status(409).json(response)
                     return
@@ -337,7 +337,7 @@ export class UserController {
                 let response = {
                     success: 1,
                     message: 'Updated username successfully',
-                    data: [{}]
+                    data: []
                 }
                 res.json(response)
                 return
@@ -355,7 +355,7 @@ export class UserController {
             let response = {
                 success: 0,
                 message: 'missing parameter {userName:}',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -366,7 +366,7 @@ export class UserController {
             let response = {
                 success: Verify.USER_USERNAME_ALREADY_EXISTS,
                 message: 'Username already exists',
-                data: [{}]
+                data: []
             }
             res.status(409).json(response)
             return
@@ -376,7 +376,7 @@ export class UserController {
             let response = {
                 success: 0,
                 message: 'missing parameter {id:}',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -389,7 +389,7 @@ export class UserController {
                 let response = {
                     success: 0,
                     message: 'Failed to Verify if token belongs to user: Database Error',
-                    data: [{}]
+                    data: []
                 }
                 res.status(500).json(response)
                 return
@@ -399,7 +399,7 @@ export class UserController {
                 let response = {
                     success: 0,
                     message: 'Token does not belong to user',
-                    data: [{}]
+                    data: []
                 }
                 res.status(401).json(response)
                 return
@@ -417,7 +417,7 @@ export class UserController {
                     let response = {
                         success: 0,
                         message: 'DATABASE ERROR: failed to update email',
-                        data: [{}]
+                        data: []
                     }
                     res.status(500).json(response)
                     return
@@ -431,7 +431,7 @@ export class UserController {
                             'Could not find the user with id ' +
                             userId +
                             ' or email already exist',
-                        data: [{}]
+                        data: []
                     }
                     res.status(409).json(response)
                     return
@@ -440,7 +440,7 @@ export class UserController {
                 let response = {
                     success: 1,
                     message: 'Updated email successfully',
-                    data: [{}]
+                    data: []
                 }
                 res.json(response)
                 return
@@ -459,7 +459,7 @@ export class UserController {
             let response = {
                 success: 0,
                 message: 'missing parameter {password:}',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -472,7 +472,7 @@ export class UserController {
             let response = {
                 success: 0,
                 message: 'missing parameter {id:}',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
             return
@@ -485,7 +485,7 @@ export class UserController {
                 let response = {
                     success: 0,
                     message: 'Failed to Verify if token belongs to user: Database Error',
-                    data: [{}]
+                    data: []
                 }
                 res.status(500).json(response)
                 return
@@ -495,7 +495,7 @@ export class UserController {
                 let response = {
                     success: 0,
                     message: 'Token does not belong to user',
-                    data: [{}]
+                    data: []
                 }
                 res.status(401).json(response)
                 return
@@ -513,7 +513,7 @@ export class UserController {
                     let response = {
                         success: 0,
                         message: 'DATABASE ERROR: failed to update password',
-                        data: [{}]
+                        data: []
                     }
                     res.status(500).json(response)
                     return
@@ -527,7 +527,7 @@ export class UserController {
                             'Could not find the user with id ' +
                             userId +
                             ' or password already exist',
-                        data: [{}]
+                        data: []
                     }
                     res.status(409).json(response)
                     return
@@ -536,7 +536,7 @@ export class UserController {
                 let response = {
                     success: 1,
                     message: 'Updated password successfully',
-                    data: [{}]
+                    data: []
                 }
                 res.json(response)
                 return
@@ -556,14 +556,14 @@ export class UserController {
                     let response = {
                         success: 1,
                         message: 'Logged out successfully',
-                        data: [{}]
+                        data: []
                     }
                     res.json(response)
                 } else {
                     let response = {
                         success: 0,
                         message: 'Logout failed: Database error',
-                        data: [{}]
+                        data: []
                     }
                     res.status(500).json(response)
                 }
@@ -572,7 +572,7 @@ export class UserController {
             let response = {
                 success: 0,
                 message: 'token not found in request',
-                data: [{}]
+                data: []
             }
             res.status(400).json(response)
         }

@@ -149,6 +149,39 @@ export class MenuController {
         })
     }
 
+    public searchMenuItems =async (req: Request, res: Response) => {
+        
+        if (req.params.search == undefined) {
+            let response = {
+                success: 0,
+                message: 'Request missing parameter {search:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        this.menuServices.searchMenu(req.params.search, (err: any, result: any) => {
+            if (err) {
+                let response = {
+                    success: 0,
+                    message: 'Failed to fetch data database Error',
+                    data: []
+                }
+                res.status(500).json(response)
+                return
+            }
+            let response = {
+                success: 1,
+                message: 'Fetched Data Successfully',
+                data: [result]
+            }
+            res.json(response)
+            return
+        })
+    }
+
+
     public removeMenuItem = async (req: Request, res: Response) => {
         if (req.params.id == undefined) {
             let response = {
