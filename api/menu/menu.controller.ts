@@ -59,7 +59,7 @@ export class MenuController {
                 let response = {
                     success: 1,
                     message: 'Successfully fetched data from the database',
-                    data: [result]
+                    data: result == null ? [] : [result] 
                 }
                 res.json(response)
                 return
