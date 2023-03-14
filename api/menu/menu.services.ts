@@ -21,6 +21,27 @@ export class MenuServices {
         }
     }
 
+    public getMenuById =async ( 
+        menuId: number, 
+        callback: (err?: any, result?: any) => void
+    ) => {
+        try {
+            const rallyDataSource = getDataSource()
+            const rallyRepo = (await rallyDataSource).getRepository(Menu)
+            const result = await rallyRepo.findOne({
+                where:{
+                    id: menuId
+                },
+                relations: {
+                    category: true
+                }
+            })
+            callback(null, result)
+        } catch (error) {
+            callback(error)
+        }
+    }
+
     public searchMenu = async (
         search: String, 
         callback: (err?: any, result?: any) => void
@@ -91,6 +112,24 @@ export class MenuServices {
             })
             callback(null, result)
         } catch (error) {
+            callback(error)
+        }
+    }
+
+    public updateMenuImage = async (
+        menuId: number,
+        image: String,
+        callback: (err?: any, result?: any) => void
+    ) => {
+        try{
+            const rallyDataSource = getDataSource()
+            const rallyRepo = (await rallyDataSource).getRepository(Menu)
+            const result = await rallyRepo.update(
+                {id: menuId},
+                {image: image}
+            )
+            callback(null, result)
+        }catch (error) {
             callback(error)
         }
     }

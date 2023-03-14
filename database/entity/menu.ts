@@ -5,6 +5,7 @@ import {
     ManyToOne,
     JoinColumn
 } from 'typeorm'
+
 import { Category } from './category'
 
 @Entity()
@@ -24,4 +25,7 @@ export class Menu {
     @ManyToOne((type) => Category)
     @JoinColumn()
     category!: Category
+
+    @Column({ nullable: false })
+    image!: String
 }

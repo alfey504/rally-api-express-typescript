@@ -32,6 +32,41 @@ export class MenuController {
         })
     }
 
+    public getMenuById = async (req: Request, res: Response) => {
+        if(req.params.menuId == undefined){
+            let response = {
+                success: 0,
+                message: 'missing parameter {menuId:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        this.menuServices.getMenuById(
+            +req.params.menuId,
+            (err?: any, result?: any) => {
+                if (err) {
+                    let response = {
+                        success: 0,
+                        message:
+                            'Failed to get menu item: Database Error',
+                        data: []
+                    }
+                    res.status(500).json(response)
+                    return
+                }
+                let response = {
+                    success: 1,
+                    message: 'Successfully fetched data from the database',
+                    data: [result]
+                }
+                res.json(response)
+                return
+            }
+        )   
+    }
+
     public getMenuByCategory = async (req: Request, res: Response) => {
         if (req.params.categoryId == undefined) {
             let response = {
@@ -70,7 +105,7 @@ export class MenuController {
                 }
 
                 let response = {
-                    success: 0,
+                    success: 1,
                     message: 'Successfully fetched data from the database',
                     data: result
                 }
@@ -174,10 +209,54 @@ export class MenuController {
             let response = {
                 success: 1,
                 message: 'Fetched Data Successfully',
-                data: [result]
+                data: result
             }
             res.json(response)
             return
+        })
+    }
+
+    public changeMenuImage = async (req: Request, res: Response) => {
+        if(req.body.menuId == undefined){
+            let response = {
+                success: 0,
+                message: 'Request missing parameter {menuId:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return 
+        }
+
+        if(req.body.image == undefined){
+            let response = {
+                success: 0,
+                message: 'Request missing parameter {image:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return 
+        }
+
+        this.menuServices.updateMenuImage(
+            +req.body.menuId, 
+            req.body.image,
+            (err?: any, result?: any) => {
+                if(err){
+                    let response = {
+                        success: 0,
+                        message: 'Failed to change the Image : Database Error',
+                        data: []
+                    }
+                    res.status(500).json(response)
+                    return
+                }
+                let response = {
+                    success: 1,
+                    message: 'Successfully changed the image of menu item',
+                    data: [result]
+                }
+                res.json(response)
+                return
         })
     }
 
