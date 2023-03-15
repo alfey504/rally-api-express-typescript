@@ -184,7 +184,7 @@ export class CartController{
             let response = {
                 success: 1,
                 message: 'Successfully fetched data from database',
-                data: [result]
+                data: result
             }
             res.json(response)
             return
@@ -244,7 +244,7 @@ export class CartController{
             let response = {
                 success: 1,
                 message: 'Successfully fetched data from database',
-                data: [result]
+                data: result
             }
             res.json(response)
             return
@@ -312,7 +312,7 @@ export class CartController{
                 let response = {
                     success: 1,
                     message: 'Successfully deleted data from database',
-                    data: [result]
+                    data: result
                 }
                 res.json(response)
                 return

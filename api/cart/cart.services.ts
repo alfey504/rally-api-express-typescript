@@ -53,7 +53,14 @@ export class CartServices{
         try {
             const rallyDataSource = getDataSource()
             const rallyRepo = (await rallyDataSource).getRepository(Cart)
-            const result = await rallyRepo.save(cart)
+            const saved = await rallyRepo.save(cart)
+            
+            const result = await rallyRepo.findOne({
+                where: {
+                    id: saved.id
+                },
+                relations: ['user', 'menu', 'menu.category']
+            })
             callback(null, result)
         } catch (error) {
             callback(error)
