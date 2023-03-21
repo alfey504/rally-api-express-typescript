@@ -41,7 +41,7 @@ export class CartServices{
             })
             callback(null, result)
         } catch (error) {
-            
+            console.log(error)
             callback(error)
         }  
     }

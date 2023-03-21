@@ -6,6 +6,7 @@ import {
     JoinColumn,
     OneToMany
 } from 'typeorm'
+import { Address } from './address'
 
 import { OrderDetails } from './order_details'
 import { User } from './users'
@@ -19,8 +20,12 @@ export class Orders {
     @JoinColumn()
     user!: User
 
-    @OneToMany((type) => OrderDetails, orderDetails => orderDetails.order)
-    orderDetails!: OrderDetails[]
+    @OneToMany((type) => OrderDetails, (orderDetails) => orderDetails.order)
+    orderDetails?: OrderDetails[]
+
+    @ManyToOne((type) => Address)
+    @JoinColumn()
+    address?: Address | number
 
     @Column({ nullable: false })
     totalPrice!: String
@@ -37,4 +42,6 @@ export class Orders {
     @Column({ nullable: false })
     paid?: boolean
 
+    @Column( {nullable: false })
+    status!: String
 }

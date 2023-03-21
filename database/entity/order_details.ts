@@ -10,14 +10,13 @@ import { Menu } from './menu'
 import { Orders } from './order'
 
 @Entity()
-export class 
-OrderDetails {
+export class OrderDetails {
     @PrimaryGeneratedColumn()
     id?: number
 
-    @ManyToOne(type => Orders, order => order.orderDetails)
-    @JoinColumn({ name: 'id' })
-    order?: Orders
+    @ManyToOne((type) => Orders, (order) => order.orderDetails)
+    @JoinColumn()
+    order?: Orders | number
 
     @ManyToOne((type) => Menu)
     @JoinColumn()
