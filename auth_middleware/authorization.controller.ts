@@ -56,6 +56,50 @@ export class AuthorizationController {
         }
     }
 
+    public static isAdmin =async ( req: Request,
+        res: Response,
+        next: any
+    ) => {
+        let token = req.get('authorization')
+        if (token == undefined) {
+            console.log('token does not exist')
+            let response = {
+                success: 0,
+                message: 'Access denied! make sure you have a token',
+                data: [{}]
+            }
+            res.status(401).json(response)
+            return
+        }
+
+        token = token.slice(7)
+        verify(
+            token,
+            process.env.TOKEN_ENCRYPTION_KEY!,
+            async (err: any, decoded: any) => {
+                if (err) {
+                    console.log('invalid token')
+                    let response = {
+                        success: 0,
+                        message: 'Invalid Token',
+                        data: []
+                    }
+                    res.status(401).json(response)
+                    return
+                } 
+                if (await AuthorizationServices.isTokenNotBlackListedAndAdmin(token!)) {
+                    next()
+                } 
+                let response = {
+                    success: 0,
+                    message: 'Invalid Token',
+                    data: []
+                }
+                res.status(401).json(response)
+            }        
+        )
+    }
+    
     public static tokenBelongsToUser = async ( 
         token: String,
         userId: number,

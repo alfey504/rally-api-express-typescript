@@ -10,6 +10,7 @@ export class UserServices {
         callback: (error?: any, result?: any) => void
     ) => {
         try {
+            user.admin = false
             const rallyDataSource = getDataSource()
             const rallyRepo = (await rallyDataSource).getRepository(User)
             const result = rallyRepo.save(user)

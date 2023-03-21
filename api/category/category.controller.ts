@@ -2,6 +2,7 @@ import { CategoryServices } from './category.services'
 import { Request, Response } from 'express'
 import { Category } from '../../database/entity/category'
 import { AnyMxRecord } from 'dns'
+import { io } from '../..'
 
 export class CategoryController {
     categoryServices: CategoryServices
@@ -57,6 +58,7 @@ export class CategoryController {
                     return
                 }
 
+                io.emit('new_category_item')
                 let response = {
                     success: 1,
                     message: 'Category added successfully',

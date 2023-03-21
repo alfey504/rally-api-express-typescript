@@ -5,7 +5,6 @@ import { Token } from '../database/entity/tokens'
 
 export class AuthorizationServices{
 
-
     public static doesTokenBelongToUser = async (
         token: String,
         userId: number,
@@ -48,11 +47,35 @@ export class AuthorizationServices{
             const result = await rallyRepo.findOne({
                 where: {
                     token: Equal(token)
-                }
+                },
             })
             return !result?.blackListed!
         } catch (error) {
             return false
         }
     }
+
+    public static isTokenNotBlackListedAndAdmin = async (
+        token: string
+    ): Promise<Boolean> => {
+        try {
+            const rallyDataSource = getDataSource()
+            const rallyRepo = (await rallyDataSource).getRepository(Token)
+            const result = await rallyRepo.findOne({
+                where: {
+                    token: Equal(token)
+                },
+                relations: {
+                    user: true
+                }
+            })
+            if(result == null){
+                return false
+            }
+            return (result.blackListed! && result.user.admin)
+        } catch (error) {
+            return false
+        }
+    }
+
 }

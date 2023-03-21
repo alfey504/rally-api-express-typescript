@@ -216,6 +216,16 @@ export class CartController{
                 return 
             }
 
+            if(result == null){
+                let response = {
+                    success: 0,
+                    message: 'Item does not exist in cart',
+                    data: []
+                }
+                res.status(401).json(response)
+                return 
+            }
+
             let doesTokenBelongToUser = await AuthorizationController.tokenBelongsToUser(token, result.user.id, (error?: any, result?: Boolean) => {
                 if(error){
                     let response = {
@@ -312,7 +322,7 @@ export class CartController{
                 let response = {
                     success: 1,
                     message: 'Successfully deleted data from database',
-                    data: result
+                    data: []
                 }
                 res.json(response)
                 return

@@ -5,25 +5,27 @@ import {
     ManyToOne,
     JoinColumn
 } from 'typeorm'
+
 import { Menu } from './menu'
-import { User } from './users'
+import { Orders } from './order'
 
 @Entity()
-export class Cart {
+export class 
+OrderDetails {
     @PrimaryGeneratedColumn()
     id?: number
 
-    @ManyToOne((type) => User)
-    @JoinColumn()
-    user!: User
+    @ManyToOne(type => Orders, order => order.orderDetails)
+    @JoinColumn({ name: 'id' })
+    order?: Orders
 
     @ManyToOne((type) => Menu)
     @JoinColumn()
     menu!: Menu
 
     @Column({ nullable: false })
-    quantity!: number
+    price!: String
 
     @Column({ nullable: false })
-    price!: string
+    quantity!: number
 }

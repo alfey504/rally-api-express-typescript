@@ -1,6 +1,7 @@
 import { MenuServices } from './menu.services'
 import { Request, Response } from 'express'
 import { Menu } from '../../database/entity/menu'
+import { io } from '../..'
 
 export class MenuController {
     
@@ -161,6 +162,7 @@ export class MenuController {
         menuItem.description = req.body.description
         menuItem.price = req.body.price
         menuItem.category = req.body.categoryId
+        menuItem.image = 'https://rossini-estenfeld.de/wp-content/uploads/2020/04/pizza-1x1.jpg'
 
         await this.menuServices.addMenu(menuItem, (err: any, result: any) => {
             if (err) {
@@ -174,6 +176,7 @@ export class MenuController {
                 return
             }
 
+            io.emit('new_menu_item')
             let response = {
                 success: 1,
                 message: 'Added menu successfully',

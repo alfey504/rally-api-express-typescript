@@ -19,4 +19,10 @@ export class User {
 
     @Column()
     verified!: boolean
+
+    @Column()
+    admin!: boolean
+
+    @Column({nullable: true})
+    stripeCustomerId!: String
 }
