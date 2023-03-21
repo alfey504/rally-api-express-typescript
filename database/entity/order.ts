@@ -7,7 +7,6 @@ import {
     OneToMany
 } from 'typeorm'
 
-import { Menu } from './menu'
 import { OrderDetails } from './order_details'
 import { User } from './users'
 

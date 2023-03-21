@@ -8,6 +8,7 @@ import { cartRouter } from './api/cart/cart.routes'
 import  http  from 'http'
 import { Server as SocketServer } from 'socket.io'
 import { addressRouter } from './api/address/address.routes'
+import { orderRouter } from './api/order/order.routes'
 
 dotenv.config()
 
@@ -27,6 +28,7 @@ app.use('/api/category', categoryRouter)
 app.use('/api/menu', menuRouter) 
 app.use('/api/cart', cartRouter) 
 app.use('/api/address', addressRouter)
+app.use('/api/orders', orderRouter)
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Home')

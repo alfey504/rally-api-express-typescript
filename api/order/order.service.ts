@@ -7,19 +7,11 @@ import { OrderDetails } from '../../database/entity/order_details'
 
 export class OrderServices{
 
-    rallyDataSource?: DataSource
-
-    constructor(){
-        let dataSource =  getDataSource()
-        dataSource.then((dataSource) => {
-            this.rallyDataSource = dataSource
-        })
-    }
-
     public makeOrderFromCart = async (
         userId: any,
         callback: (err?: any, order?: Orders) => void
     ) =>  {
+
         try{
             let orderDetailsList = Array<OrderDetails>()
             const order = new Orders()
@@ -28,24 +20,28 @@ export class OrderServices{
             let carts = await this.getCartItems(userId)
             let priceBeforeTax = BigNumber(0)
 
-            carts.forEach(cart => {
+            let rallyDataSource = await getDataSource()
+
+            carts.forEach(async (cart) => {
                 let orderDetail = new OrderDetails()
-                orderDetail.order = order
                 orderDetail.menu = cart.menu
                 orderDetail.quantity = cart.quantity
                 orderDetail.price = cart.price
                 priceBeforeTax = priceBeforeTax.plus(cart.price)
+                orderDetailsList.push(orderDetail)
             })
+
             order.orderDetails = orderDetailsList
             order.beforeTaxPrice = priceBeforeTax.toString()
-            order.taxPrice = priceBeforeTax.multipliedBy('1.13').toString()
+            order.taxPrice = priceBeforeTax.multipliedBy('0.13').toString()
             order.totalPrice = priceBeforeTax.plus(order.taxPrice.toString()).toString()
             order.paid = false
 
-            let orderRepo = this.rallyDataSource?.getRepository(Orders)
-            let result = await orderRepo?.save(order)
-            callback(null, order)
+            let orderRepo = rallyDataSource.getRepository(Orders)
+            let result = await orderRepo.save(order)
+            callback(null, result)
         }catch(error){
+            console.log(error)
             callback(error)
         }
     }
@@ -55,7 +51,8 @@ export class OrderServices{
         callback: (err?: any, order?: Orders[]) => void
     ) =>  {
         try{
-            let orderRepo = this.rallyDataSource?.getRepository(Orders)
+            let rallyDataSource = await getDataSource()
+            let orderRepo = rallyDataSource.getRepository(Orders)
             let result = await orderRepo?.find({
                 where: {
                     id: Equal(orderId)
@@ -70,20 +67,21 @@ export class OrderServices{
             callback(error)
         }
     }
+
     
     public getCartItems = async (
         userId: number,
     ) : Promise<Cart[]> => {
 
         try{
-            const rallyRepo = this.rallyDataSource?.getRepository(Cart)
-            const result = await rallyRepo?.find({
+            let rallyDataSource = await getDataSource()
+            let cartRepo = rallyDataSource.getRepository(Cart)
+            const result = await cartRepo.find({
                 where: {
                     user: Equal(userId)
                 },
                 relations: {
                     menu: true,
-
                 }
             })
             if(result == undefined){
