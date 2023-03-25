@@ -1,10 +1,11 @@
 import { Request, Response } from 'express'
 import Stripe from 'stripe'
 import { Orders } from '../../database/entity/order'
-import { OrderServices } from './order.service'
+import { OrderServices, OrderStatus } from './order.service'
 import * as dotenv from 'dotenv'
 import * as path  from 'path'
 import BigNumber from 'bignumber.js'
+import { OrderSockets } from './order.socket'
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env')})
 
@@ -17,9 +18,11 @@ const stripe = new Stripe(process.env.STRIPE_API_KEY! , {
 export class  OrderController{
 
     orderServices: OrderServices
+    orderSocket: OrderSockets
 
     constructor(){
         this.orderServices = new OrderServices()
+        this.orderSocket = new OrderSockets()
     }
 
     public makeOrderFromCart = async (req : Request, res: Response) => {
@@ -76,6 +79,17 @@ export class  OrderController{
                 res.status(500).json(response)
                 return
             }
+
+            if(order == null){
+                let response = {
+                    success: 0,
+                    message: 'no order in database with the id',
+                    data: []
+                }
+                res.status(404).json(response)
+                return
+            }
+
             let response = {
                 success: 1,
                 message: 'Successfully fetched order',
@@ -84,6 +98,78 @@ export class  OrderController{
             res.json(response)
             return
         })        
+    }
+
+    public getOrderByUser = async (req: Request, res: Response) => {
+
+        if(req.params.userId == undefined){
+            let response = {
+                success: 0,
+                message: 'missing parameter {userId:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        this.orderServices.findUsersOrders(
+            +req.params.userId, 
+            (err?: any, orders?: Orders[]) => 
+        {
+            if(err){
+                let response = {
+                    success: 0,
+                    message: 'failed to fetch orders: Database Error',
+                    data: []
+                }
+                res.status(500).json(response)
+                return
+            }
+
+            let response = {
+                success: 1,
+                message: 'Successfully fetched order',
+                data: orders
+            }
+            res.json(response)
+            return
+        })
+    }
+
+    public getOrderByStatus = async (req: Request, res: Response) => {
+
+        if(req.params.status == undefined || !(req.params.status in OrderStatus)){
+            let response = {
+                success: 0,
+                message: 'invalid parameter {status:} options {pending, rejected, preparing, waiting_for_pickup, on_the_way, completed}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        this.orderServices.findOrderByStatus(
+            req.params.status as OrderStatus, 
+            (err?: any, orders?: Orders[]) => 
+        {
+            if(err){
+                let response = {
+                    success: 0,
+                    message: 'failed to fetch orders: Database Error',
+                    data: []
+                }
+                res.status(500).json(response)
+                return
+            }
+
+            let response = {
+                success: 1,
+                message: 'Successfully fetched order',
+                data: orders
+            }
+            res.json(response)
+            return
+        })
     }
 
     public makePaymentIntent = async (req: Request, res: Response) => {
@@ -195,6 +281,8 @@ export class  OrderController{
 
         try{
             await this.orderServices.updatePaid(+req.body.orderId, true)
+            await this.orderServices.deleteOrderAssociatedCarts(+req.body.orderId)
+            
             let response = {
                 success: 1,
                 message: 'successfully updated order',
@@ -212,4 +300,84 @@ export class  OrderController{
             return
         }
     }
+
+
+    public updateOrderStatus = async (req: Request, res: Response) => {
+        if(req.body.orderId == undefined){
+            let response = {
+                success: 0,
+                message: 'missing parameter {orderId:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        if(req.body.status == undefined || !(req.body.status in OrderStatus)){
+            let response = {
+                success: 0,
+                message: 'invalid parameter {status:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        try{
+            await this.orderServices.updateStatus(+req.body.orderId, req.body.status)
+            let response = {
+                success: 1,
+                message: 'successfully updated order',
+                data: []
+            }
+            res.json(response)
+            this.orderSocket.notifyStatusChange(+req.body.orderId)
+
+        }catch(error){
+            console.log(error)
+            let response = {
+                success: 0,
+                message: 'failed to updated order: Database Error',
+                data: []
+            }
+            res.status(500).json(response)
+            return
+        }
+    }
+
+    public deleteOrderById = async (req: Request, res: Response) => {
+        if(req.params.orderId == undefined){
+            let response = {
+                success: 0,
+                message: 'missing parameter {orderId:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        try{
+            await this.orderServices.deleteOrder(+req.params.orderId)
+            let response = {
+                success: 1,
+                message: 'successfully deleted order',
+                data: []
+            }
+            res.json(response)
+
+        }catch(error){
+            console.log(error)
+            let response = {
+                success: 0,
+                message: 'failed to delete order: Database Error',
+                data: []
+            }
+            res.status(500).json(response)
+            return
+        }
+    }
+
+
+
+
 }

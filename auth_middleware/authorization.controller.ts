@@ -87,8 +87,10 @@ export class AuthorizationController {
                     res.status(401).json(response)
                     return
                 } 
-                if (await AuthorizationServices.isTokenNotBlackListedAndAdmin(token!)) {
+                console.log(await AuthorizationServices.isTokenNotBlackListedAndAdmin(token!))
+                if (!await AuthorizationServices.isTokenNotBlackListedAndAdmin(token!)) {
                     next()
+                    return
                 } 
                 let response = {
                     success: 0,
@@ -99,7 +101,7 @@ export class AuthorizationController {
             }        
         )
     }
-    
+
     public static tokenBelongsToUser = async ( 
         token: String,
         userId: number,

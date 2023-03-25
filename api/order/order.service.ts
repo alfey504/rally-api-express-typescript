@@ -3,15 +3,17 @@ import { DataSource, Equal } from 'typeorm'
 import { getDataSource } from '../../database/data_source'
 import { Cart } from '../../database/entity/carts'
 import { Orders } from '../../database/entity/order'
+import { OrderCart } from '../../database/entity/order_cart'
 import { OrderDetails } from '../../database/entity/order_details'
 import { User } from '../../database/entity/users'
+import { CartServices } from '../cart/cart.services'
 
 export enum OrderStatus{
     pending = 'pending',
     rejected = 'rejected',
     preparing = 'preparing',
-    waitingForPickup = 'waiting_for_pickup',
-    onTheWay = 'on_the_way',
+    waiting_for_pickup = 'waiting_for_pickup',
+    on_the_way = 'on_the_way',
     completed = 'completed'
 }
 
@@ -57,6 +59,8 @@ export class OrderServices{
                 await orderDetailRepo.save(orderDetail)
             })
 
+            await this.addToOrderCartAssociation(result.id!, carts)
+
             callback(null, result)
         }catch(error){
             console.log(error)
@@ -83,6 +87,49 @@ export class OrderServices{
             callback(error)
         }
     }
+
+    public findOrderByStatus = async (
+        status: OrderStatus,
+        callback: (err?: any, order?: Orders[]) => void
+    ) =>  {
+        try{
+            let rallyDataSource = await getDataSource()
+            let orderRepo = rallyDataSource.getRepository(Orders)
+            let result = await orderRepo.find({
+                where: {
+                    status: Equal(status.toString())
+                },
+                relations: ['user', 'orderDetails', 'orderDetails.menu','address']
+            })
+            callback(null, result)
+        }catch(error){
+            console.log(error)
+            callback(error)
+        }
+    }
+
+    public findUsersOrders = async (
+        userId: number,
+        callback: (err?: any, orders?: Orders[]) => void
+    ) => {
+            
+        try{
+            let rallyDataSource = await getDataSource()
+            let orderRepo = rallyDataSource.getRepository(Orders)
+            let result = await orderRepo.find({
+                where: {
+                    user: Equal(userId),
+                    paid: Equal(true)
+                },
+                relations: ['user', 'orderDetails', 'orderDetails.menu','address']
+            })
+            callback(null, result)
+        }catch(error){
+            console.log(error)
+            callback(error)
+        }
+    }
+    
 
     
     public getCartItems = async (
@@ -195,6 +242,115 @@ export class OrderServices{
                 { id: orderId}, 
                 { paid: paid }
             )
+        }catch(error){
+            console.log(error)
+            throw error
+        } 
+    }
+
+    public updateStatus = async (
+        orderId: number,
+        status: OrderStatus,
+    ) => {
+        try{
+            let rallyDataSource = await getDataSource()
+            let orderRepo = rallyDataSource.getRepository(Orders)
+            const result = await orderRepo.update(
+                { id: orderId }, 
+                { status: status }
+            )
+        }catch(error){
+            console.log(error)
+            throw error
+        } 
+    }
+
+    public deleteOrder = async (
+        orderId: number,
+    ) => {
+        try{
+            let rallyDataSource = await getDataSource()
+            let orderRepo = rallyDataSource.getRepository(Orders)
+            const result = await orderRepo.delete({ id: Equal(orderId) })
+        }catch(error){
+            console.log(error)
+            throw error
+        } 
+    }
+
+    public addToOrderCartAssociation = async (
+        orderId: number,
+        carts: Cart[]
+    ) => {
+        try{
+            console.log('Carts -> ' + carts)
+            const orderCart = new OrderCart()
+            orderCart.associatedOrder = orderId
+            orderCart.associatedCarts = carts
+            let rallyDataSource = await getDataSource()
+            let orderCartRepo = rallyDataSource.getRepository(OrderCart)
+            const result = await orderCartRepo.save(orderCart)
+        }catch(error){
+            console.log(error)
+            throw error
+        } 
+    }
+
+    public findToOrderCartAssociation = async (
+        orderId: number,
+    ): Promise<Cart[]> => {
+        try{
+            let rallyDataSource = await getDataSource()
+            let orderCartRepo = rallyDataSource.getRepository(OrderCart)
+            const result = await orderCartRepo.findOne({
+                where: {
+                    associatedOrder: Equal(orderId)
+                },
+                relations: {
+                    associatedCarts: true
+                }
+            })
+            if(result == null){
+                throw new Error('no orderId')
+            }
+            return result.associatedCarts!
+        }catch(error){
+            console.log(error)
+            throw error
+        } 
+    }
+
+    public deleteOrderCart = async (
+        orderId: number,
+    ) => {
+        try{
+            let rallyDataSource = await getDataSource()
+            let orderCartRepo = rallyDataSource.getRepository(OrderCart)
+            const result = await orderCartRepo.delete({associatedOrder: Equal(orderId)})
+        }catch(error){
+            console.log(error)
+            throw error
+        } 
+    }
+
+    public deleteOrderAssociatedCarts = async (
+        orderId: number,
+    ) => {
+        try{
+            console.log('OrderServices -> deleteOrderAssociatedCarts')
+            const carts = await this.findToOrderCartAssociation(orderId)
+            console.log(carts)
+            await this.deleteOrderCart(orderId)
+            let rallyDataSource = await getDataSource()
+            let cartService = new CartServices()
+            carts.forEach((cart)=> {
+                cartService.deleteFromCart(cart.id!, (err?: any, result?: any)=>{
+                    if(err){
+                        throw err
+                    }
+                })
+            })
+            await this.deleteOrderCart(orderId)
         }catch(error){
             console.log(error)
             throw error
