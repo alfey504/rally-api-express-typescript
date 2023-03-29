@@ -9,3 +9,4 @@ cartRouter.get('/:cartId', AuthorizationController.verifyToken, cartController.g
 cartRouter.get('/user/:userId', AuthorizationController.verifyToken, cartController.getUsersItems)
 cartRouter.post('/', AuthorizationController.verifyToken, cartController.addItemToCart)
 cartRouter.delete('/:cartId', AuthorizationController.verifyToken, cartController.removeCartItem)
+cartRouter.patch('/quantity', AuthorizationController.verifyToken, cartController.updateQuantityInCart)

@@ -1,4 +1,4 @@
-import { Equal } from 'typeorm'
+import { Equal, UpdateResult } from 'typeorm'
 import { getDataSource } from '../../database/data_source'
 import { Cart } from '../../database/entity/carts'
 import { Menu } from '../../database/entity/menu'
@@ -28,7 +28,7 @@ export class CartServices{
 
     public getCartItem =async (
         cartId: number, 
-        callback: (err?: any, result?: any) => void
+        callback: (err?: any, result?: Cart | null) => void
     ) => {
         try {
             const rallyDataSource = getDataSource()
@@ -83,7 +83,22 @@ export class CartServices{
         }  
     }
 
-    public getMenuItem =async (
+    public updateCartQuantity = async (
+        cartId: number, 
+        quantity: number,
+        callback: (err?: any, result?: UpdateResult) => void
+    ) => {
+        try {
+            const rallyDataSource = getDataSource()
+            const rallyRepo = (await rallyDataSource).getRepository(Cart)
+            const result = await rallyRepo.update({id: Equal(cartId)}, {quantity: quantity})
+            callback(null, result)
+        } catch (error) {
+            callback(error)
+        }
+    }
+
+    public getMenuItem = async (
         menuId: number, 
         callback: (err?: any, result?: any) => void
     ) => {

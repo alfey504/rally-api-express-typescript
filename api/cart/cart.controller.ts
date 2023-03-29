@@ -3,6 +3,8 @@ import { CartServices } from './cart.services'
 import BigNumber from 'bignumber.js'
 import { Cart } from '../../database/entity/carts'
 import { AuthorizationController } from '../../auth_middleware/authorization.controller'
+import { CartSockets } from './cart.socket'
+import { UpdateResult } from 'typeorm'
 
 
 export class CartController{
@@ -124,6 +126,8 @@ export class CartController{
                     data: [result]
                 }
                 res.json(response)
+                let cartSockets = new CartSockets()
+                cartSockets.notifyCartUpdate(req.body.userId)
                 return
             })
         })
@@ -261,6 +265,89 @@ export class CartController{
         })
     }
 
+    public updateQuantityInCart = async (req: Request, res: Response) => {
+        if(req.body.cartId == undefined){
+            let response = {
+                success: 0,
+                message: 'missing parameter {cartId:} in request',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        if(req.body.quantity == undefined){
+            let response = {
+                success: 0,
+                message: 'missing parameter {quantity:} in request',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        this.cartServices.getCartItem(+req.body.cartId, (err?: any, result?: Cart | null) => {
+            if(err){
+                let response = {
+                    success: 0,
+                    message: 'Failed to check if cart exists: Database Error',
+                    data: []
+                }
+                res.status(500).json(response)
+                return
+            }
+
+            if(result == null){
+                let response = {
+                    success: 0,
+                    message: 'Cart with given {cartId: } does not exist',
+                    data: []
+                }
+                res.status(500).json(response)
+                return
+            }
+
+            let cartItem = result
+
+            this.cartServices.updateCartQuantity(
+                +req.body.cartId,
+                +req.body.quantity,
+                (err?: any, result?: UpdateResult) => {
+                    if(err){
+                        let response = {
+                            success: 0,
+                            message: 'Failed to update quantity: Database Error',
+                            data: []
+                        }
+                        res.status(500).json(response)
+                        return
+                    }
+
+                    if(result?.affected == 0){
+                        let response = {
+                            success: 0,
+                            message: 'Update quantity Failed',
+                            data: []
+                        }
+                        res.status(500).json(response)
+                        return
+                    }
+                    
+                    let response = {
+                        success: 1,
+                        message: 'Successfully updated quantity',
+                        data: []
+                    }
+                    res.json(response)
+
+                    let cartSockets = new CartSockets()
+                    cartSockets.notifyCartUpdate(cartItem.user.id!!)
+                    return
+                }
+            )
+        })
+    }
+
     public removeCartItem = async (req: Request, res: Response) => {
 
         if(req.params.cartId == undefined) {
@@ -283,6 +370,8 @@ export class CartController{
                 res.status(500).json(response)
                 return 
             }
+
+            let cartItem = result
 
             let token = req.get('authorization')!!
             token = token.slice(7)
@@ -324,6 +413,9 @@ export class CartController{
                     message: 'Successfully deleted data from database',
                     data: []
                 }
+                let cartSockets = new CartSockets()
+                cartSockets.notifyCartDelete(cartItem)
+
                 res.json(response)
                 return
             })

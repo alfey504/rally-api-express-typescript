@@ -40,23 +40,23 @@ app.get('/', (req: Request, res: Response) => {
 
 export let socketIds: Map<String, Array<String>> = new Map()
 
+
 io.on('connection', (socket) => {
-    console.log('a user connected')
-    console.log(socket.handshake)
-    // console.log(socket.handshake.query.userId)
     if(socket.handshake.query.userId){
-        console.log(socket.handshake.query.userId)
+        console.log('yeahh boii')
         let userId = socket.handshake.query.userId.toString()
         if(!socketIds.has(userId)){
             socketIds.set(userId, [socket.id])
         }else{
             socketIds.get(userId)?.push(socket.id)
         }
-        console.log(socketIds)
     }
 
+    io.on('set_user', (data) => {
+        console.log('user set call : ', + data)
+    })
+
     io.on('disconnect', (socket) => {
-        console.log('disconnected')
         if(socket.handshake.query.userId){
             const userId = socket.handshake.query.userId.toString()
             const index = socketIds.get(userId)?.indexOf(socket.id)

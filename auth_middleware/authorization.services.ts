@@ -22,8 +22,7 @@ export class AuthorizationServices{
                     token: Equal(token)
                 }
             })
-            console.log('Authorization Services -> doesTokenBelongToUser > Result: ' , result)
-
+           
             if(result!!.user.id == userId){
                 callback(null, true)
                 return true
