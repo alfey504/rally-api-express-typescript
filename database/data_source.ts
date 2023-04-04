@@ -20,7 +20,7 @@ const rallyDataSource = new DataSource({
     host: process.env.DB_HOST,
     port: +process.env.DB_PORT!,
     username: process.env.DB_USERNAME,
-    password: process.env.TEST_DB_PASSWORD,
+    password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     entities: [User, Category, Menu, Token, Cart, Address, Orders, OrderDetails, OrderCart]
 })
