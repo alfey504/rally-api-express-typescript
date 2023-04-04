@@ -9,8 +9,6 @@ import  http  from 'http'
 import { Server as SocketServer } from 'socket.io'
 import { addressRouter } from './api/address/address.routes'
 import { orderRouter } from './api/order/order.routes'
-import { Socket } from 'dgram'
-import { disconnect } from 'process'
 import { adminRouter } from './api/admin/admin.routes'
 
 dotenv.config()
@@ -24,7 +22,6 @@ type DevEnvs = 'DEV' | 'PROD'
 export let env_type: DevEnvs = 'PROD'
 
 console.log(env_type)
-
 const port = process.env.PORT || '8000'
 
 const server = http.createServer(app)
