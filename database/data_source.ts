@@ -17,10 +17,10 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env')})
 
 const rallyDataSource = new DataSource({
     type: 'mysql',
-    host: (env_type == 'PROD') ? process.env.DB_HOST : process.env.TEST_DB_HOST,
-    port: (env_type == 'PROD') ? +process.env.DB_PORT! : +process.env.TEST_DB_PORT!,
-    username: (env_type == 'PROD') ? process.env.DB_USERNAME : process.env.TEST_DB_USERNAME,
-    password: (env_type == 'PROD') ? process.env.DB_PASSWORD : process.env.TEST_DB_PASSWORD,
+    host: process.env.DB_HOST,
+    port: +process.env.DB_PORT!,
+    username: process.env.DB_USERNAME,
+    password: process.env.TEST_DB_PASSWORD,
     database: process.env.DB_NAME,
     entities: [User, Category, Menu, Token, Cart, Address, Orders, OrderDetails, OrderCart]
 })
