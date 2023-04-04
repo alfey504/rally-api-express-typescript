@@ -356,4 +356,44 @@ export class OrderServices{
             throw error
         } 
     }
+
+    public saveOrder = async (
+        order: Orders,
+        callback: (err?: any, order?: Orders) => void
+    ) =>  {
+        try{
+            let rallyDataSource = await getDataSource()
+            let orderRepo = rallyDataSource.getRepository(Orders)
+            let result = await orderRepo.save(order)
+            callback(null, result)
+        }catch(error){
+            console.log(error)
+            callback(error)
+        }
+    }
+
+    public saveOrderDetailsList = async (
+        orderDetails: Array<OrderDetails>,
+        orderId: number,
+        callback: (err?: any, orderDetails?: Array<OrderDetails>) => void
+    ) =>  {
+        try{
+            let rallyDataSource = await getDataSource()
+            let orderDetailRepo = rallyDataSource.getRepository(OrderDetails)
+            
+            let savedDetails = Array<OrderDetails>()
+
+            orderDetails.forEach( async (orderDetail) => {
+                orderDetail.order = orderId
+                let result = await orderDetailRepo.save(orderDetail)
+                savedDetails.push(result)
+            })
+
+            callback(null, savedDetails)
+        }catch(error){
+            console.log(error)
+            callback(error)
+        }
+    }
+
 }

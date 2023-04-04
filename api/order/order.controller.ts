@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv'
 import * as path  from 'path'
 import BigNumber from 'bignumber.js'
 import { OrderSockets } from './order.socket'
+import { OrderDetails } from '../../database/entity/order_details'
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env')})
 
@@ -375,6 +376,97 @@ export class  OrderController{
             res.status(500).json(response)
             return
         }
+    }
+
+    public reorderOrderById = async (req : Request, res: Response) => {
+        
+        if(req.body.orderId == undefined){
+            let response = {
+                success: 0,
+                message: 'missing parameter {orderId:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+        
+        this.orderServices.findOrderById(
+            +req.body.orderId, 
+            (err?: any, order?: Orders | null | undefined) => 
+        {
+
+            if(err){
+                console.log(err)
+                let response = {
+                    success: 0,
+                    message: 'failed to find order: Database Error',
+                    data: []
+                }
+                res.status(500).json(response)
+                return 
+            }
+            
+            let newOrder = new Orders()
+            let orderDetailsList = Array<OrderDetails>()
+            let priceBeforeTax = BigNumber(0)
+
+            order?.orderDetails!.forEach((orderItem) => {
+                let orderDetail = new OrderDetails()
+                orderDetail.menu = orderItem.menu
+                orderDetail.quantity = orderItem.quantity
+                orderDetail.price = orderItem.price
+                priceBeforeTax = priceBeforeTax.plus(BigNumber(orderItem.price.toString()))
+                orderDetailsList.push(orderDetail)
+            })
+
+            newOrder.orderDetails = orderDetailsList
+            newOrder.beforeTaxPrice = priceBeforeTax.toString()
+            newOrder.taxPrice = priceBeforeTax.multipliedBy('0.13').toString()
+            newOrder.totalPrice = priceBeforeTax.plus(newOrder.taxPrice.toString()).toString()
+            newOrder.paid = false
+            newOrder.status = OrderStatus.pending
+            
+            this.orderServices.saveOrder(newOrder, (err?: any, order?: Orders) => {
+                if(err){
+                    console.log(err)
+                    let response = {
+                        success: 0,
+                        message: 'failed to save order: Database Error',
+                        data: []
+                    }
+                    res.status(500).json(response)
+                    return 
+                }
+
+                this.orderServices.saveOrderDetailsList(
+                    orderDetailsList,
+                    order!.id!,
+                    (err?: any, orderDetails?: Array<OrderDetails>) => {
+                    if(err){
+                        console.log(err)
+                        let response = {
+                            success: 0,
+                            message: 'failed to save order: Database Error',
+                            data: []
+                        }
+                        res.status(500).json(response)
+                        return  
+                    }
+                    
+                    let response = {
+                        success: 1,
+                        message: 'Successfully made order',
+                        data: [order]
+                    }
+                    res.json(response)
+                    return
+
+                })
+
+            })
+
+
+        })
     }
 
 
