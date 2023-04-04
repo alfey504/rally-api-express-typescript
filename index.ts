@@ -17,6 +17,14 @@ dotenv.config()
 
 const app = express()
 app.use(express.json())
+
+
+type DevEnvs = 'DEV' | 'PROD'
+
+export let env_type: DevEnvs = 'PROD'
+
+console.log(env_type)
+
 const port = process.env.PORT || '8000'
 
 const server = http.createServer(app)
