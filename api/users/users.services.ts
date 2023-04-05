@@ -151,4 +151,43 @@ export class UserServices {
             callback(error)
         }
     }
+
+    // update entire user
+
+    public updateUser = async (
+        userId: number,
+        userName: String,
+        fullName: String,
+        email: String,
+        password: String | undefined,
+        callback: (err?: any, result?: any) => void
+    ) => {
+
+        let updates: any
+
+        if(password == undefined){
+            updates = { 
+                userName: userName,
+                email: email,
+                fullName: fullName,
+            }
+        }else{
+            updates = { 
+                userName: userName,
+                email: email,
+                fullName: fullName,
+                password: password
+            }
+        }
+
+        try{
+            const rallyDataSource = getDataSource()
+            const rallyRepo = (await rallyDataSource).getRepository(User)
+            const result = await rallyRepo.update({ id: Equal(userId) }, updates)
+            callback(null, result)  
+        }catch(err){
+            callback(err, null)
+            return
+        }
+    }
 }

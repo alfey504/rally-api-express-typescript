@@ -577,4 +577,141 @@ export class UserController {
             res.status(400).json(response)
         }
     }
+
+    public updateUser = async (req: Request, res: Response) => {
+        let password = req.body.password
+        let fullName = req.body.fullName
+        let email = req.body.email
+        let userName = req.body.userName
+        let userId = req.body.userId
+
+        if (req.body.fullName == undefined) {
+            let response = {
+                success: 0,
+                message: 'missing parameter {fullName:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        if (req.body.email == undefined) {
+            let response = {
+                success: 0,
+                message: 'missing parameter {email:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        if (req.body.userName == undefined) {
+            let response = {
+                success: 0,
+                message: 'missing parameter {userName:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        if (await this.verify.doesUserNameExist(req.body.userName)) {
+            let response = {
+                success: Verify.USER_USERNAME_ALREADY_EXISTS,
+                message: 'Username already exists',
+                data: []
+            }
+            res.status(409).json(response)
+            return
+        }
+
+        if (req.body.password != undefined) {
+            const salt = genSaltSync(10)
+            password = hashSync(password!.toString(), salt)
+        }else{
+            password = null
+        }
+
+        const salt = genSaltSync(10)
+        password = hashSync(password!.toString(), salt)
+
+        if (req.body.userId == undefined) {
+            let response = {
+                success: 0,
+                message: 'missing parameter {id:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        let token = req.get('authorization')!!
+        token = token.slice(7)
+        let result = AuthorizationController.tokenBelongsToUser(token, +req.body.userId, (err?: any, result?: Boolean) => {
+            if(err){
+                let response = {
+                    success: 0,
+                    message: 'Failed to Verify if token belongs to user: Database Error',
+                    data: []
+                }
+                res.status(500).json(response)
+                return
+            }
+            if(!result){
+
+                let response = {
+                    success: 0,
+                    message: 'Token does not belong to user',
+                    data: []
+                }
+                res.status(401).json(response)
+                return
+            }
+        })
+
+        if(result == undefined) return
+
+        this.userServices.updateUser(
+            userId = +req.body.userId,
+            userName = req.body.userName,
+            fullName = req.body.fullName,
+            email = req.body.fullName,
+            password = password,
+            (err?: any, result?: any) => {
+                if (err) {
+                    console.log(err)
+                    let response = {
+                        success: 0,
+                        message: 'DATABASE ERROR: failed to update user',
+                        data: []
+                    }
+                    res.status(500).json(response)
+                    return
+                } 
+                
+                if (result.affected == 0) {
+                    console.log(result.affected)
+                    let response = {
+                        success: Verify.USER_ID_DOES_NOT_EXIST,
+                        message:
+                            'Could not find the user with id ' +
+                            userId +
+                            ' or data already exist',
+                        data: []
+                    }
+                    res.status(409).json(response)
+                    return
+                }
+                        
+                let response = {
+                    success: 1,
+                    message: 'Updated user successfully',
+                    data: []
+                }
+                res.json(response)
+                return
+            }
+        )
+    }
+
 }
