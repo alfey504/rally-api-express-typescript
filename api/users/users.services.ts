@@ -190,4 +190,19 @@ export class UserServices {
             return
         }
     }
+
+    public findUserBy = async (
+        userId: number,
+        callback: (err?: any, result?: User| null) => void 
+    ) => {
+        try{
+            const rallyDataSource = getDataSource()
+            const rallyRepo = (await rallyDataSource).getRepository(User)
+            const result = await rallyRepo.findOne({where: { id: Equal(userId) }})
+            callback(null, result)  
+        }catch(err){
+            callback(err, null)
+            return
+        }
+    }
 }

@@ -39,3 +39,9 @@ usersRoute.put(
 
 // logout the user
 usersRoute.delete('/logout', AuthorizationController.verifyToken, userController.logoutUser)
+
+// update user route
+usersRoute.patch('/', AuthorizationController.verifyToken, userController.updateUser)
+
+// get user by their id
+usersRoute.get('/:userId', AuthorizationController.verifyToken, userController.getUserById)

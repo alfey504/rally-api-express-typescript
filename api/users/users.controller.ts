@@ -578,11 +578,41 @@ export class UserController {
         }
     }
 
+    public getUserById = async (req: Request, res: Response) => {
+
+        if (req.params.userId == undefined) {
+            let response = {
+                success: 0,
+                message: 'missing parameter {id:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        this.userServices.findUserBy(+req.params.userId, (err?: any, result?: User | null) => {
+            if(err){
+                let response = {
+                    success: 0,
+                    message: 'Failed to Fetch user: Database Error',
+                    data: []
+                }
+                res.status(500).json(response)
+                return
+            }
+
+            let response = {
+                success: 1,
+                message: 'fetched successfully',
+                data: [result]
+            }
+            res.json(response)
+            return
+        })
+    }
+
     public updateUser = async (req: Request, res: Response) => {
         let password = req.body.password
-        let fullName = req.body.fullName
-        let email = req.body.email
-        let userName = req.body.userName
         let userId = req.body.userId
 
         if (req.body.fullName == undefined) {
@@ -632,9 +662,6 @@ export class UserController {
             password = null
         }
 
-        const salt = genSaltSync(10)
-        password = hashSync(password!.toString(), salt)
-
         if (req.body.userId == undefined) {
             let response = {
                 success: 0,
@@ -673,10 +700,10 @@ export class UserController {
 
         this.userServices.updateUser(
             userId = +req.body.userId,
-            userName = req.body.userName,
-            fullName = req.body.fullName,
-            email = req.body.fullName,
-            password = password,
+            req.body.userName,
+            req.body.fullName,
+            req.body.fullName,
+            password,
             (err?: any, result?: any) => {
                 if (err) {
                     console.log(err)
