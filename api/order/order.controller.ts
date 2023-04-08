@@ -7,6 +7,7 @@ import * as path  from 'path'
 import BigNumber from 'bignumber.js'
 import { OrderSockets } from './order.socket'
 import { OrderDetails } from '../../database/entity/order_details'
+import { OneToMany } from 'typeorm'
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env')})
 
@@ -38,7 +39,11 @@ export class  OrderController{
             return
         }
 
-        this.orderServices.makeOrderFromCart(+req.body.userId, (err?: any, order?: Orders) =>  {
+
+        this.orderServices.makeOrderFromCart(
+            +req.body.userId,
+            req.body.voucherId, 
+            (err?: any, order?: Orders) =>  {
             if(err){
                 let response = {
                     success: 0,
@@ -204,7 +209,7 @@ export class  OrderController{
                 res.status(500).json(response)
                 return
             }
-            if(order == null){
+            if(order == null || order == undefined){
                 let response = {
                     success: 0,
                     message: 'There was no order with given order id',
@@ -213,7 +218,7 @@ export class  OrderController{
                 res.status(500).json(response)
                 return
             }
-            
+            console.log(order)
             let stripeCustomerId = await this.orderServices.getStripeCustomerIdFromUser(order.user.id!)
             if(stripeCustomerId == null){ 
                 try{
@@ -282,6 +287,7 @@ export class  OrderController{
 
         try{
             await this.orderServices.updatePaid(+req.body.orderId, true)
+            await this.orderServices.updateDate(+req.body.orderId, new Date())
             await this.orderServices.deleteOrderAssociatedCarts(+req.body.orderId)
             
             let response = {
@@ -407,6 +413,7 @@ export class  OrderController{
             }
             
             let newOrder = new Orders()
+            newOrder.user = order?.user!!
             let orderDetailsList = Array<OrderDetails>()
             let priceBeforeTax = BigNumber(0)
 
@@ -464,12 +471,6 @@ export class  OrderController{
                 })
 
             })
-
-
         })
     }
-
-
-
-
 }

@@ -645,16 +645,6 @@ export class UserController {
             return
         }
 
-        if (await this.verify.doesUserNameExist(req.body.userName)) {
-            let response = {
-                success: Verify.USER_USERNAME_ALREADY_EXISTS,
-                message: 'Username already exists',
-                data: []
-            }
-            res.status(409).json(response)
-            return
-        }
-
         if (req.body.password != undefined) {
             const salt = genSaltSync(10)
             password = hashSync(password!.toString(), salt)

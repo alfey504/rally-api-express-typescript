@@ -10,6 +10,7 @@ import { Server as SocketServer } from 'socket.io'
 import { addressRouter } from './api/address/address.routes'
 import { orderRouter } from './api/order/order.routes'
 import { adminRouter } from './api/admin/admin.routes'
+import { voucherRouter } from './api/voucher/voucher.routes'
 
 dotenv.config()
 
@@ -38,6 +39,7 @@ app.use('/api/cart', cartRouter)
 app.use('/api/address', addressRouter)
 app.use('/api/orders', orderRouter)
 app.use('/api/admin', adminRouter)
+app.use('/api/voucher', voucherRouter)
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Home')

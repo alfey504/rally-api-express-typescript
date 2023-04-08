@@ -7,6 +7,8 @@ import { OrderCart } from '../../database/entity/order_cart'
 import { OrderDetails } from '../../database/entity/order_details'
 import { User } from '../../database/entity/users'
 import { CartServices } from '../cart/cart.services'
+import { VoucherServices } from '../voucher/voucher.services'
+import { Voucher } from '../../database/entity/voucher'
 
 export enum OrderStatus{
     pending = 'pending',
@@ -21,10 +23,12 @@ export class OrderServices{
 
     public makeOrderFromCart = async (
         userId: any,
+        voucherId: number | undefined,
         callback: (err?: any, order?: Orders) => void
     ) =>  {
 
         try{
+
             let orderDetailsList = Array<OrderDetails>()
             const order = new Orders()
             order.user = userId
@@ -44,13 +48,33 @@ export class OrderServices{
                 orderDetailsList.push(orderDetail)
             })
 
-            order.orderDetails = orderDetailsList
-            order.beforeTaxPrice = priceBeforeTax.toString()
-            order.taxPrice = priceBeforeTax.multipliedBy('0.13').toString()
-            order.totalPrice = priceBeforeTax.plus(order.taxPrice.toString()).toString()
-            order.paid = false
-            order.status = OrderStatus.pending
+            
+            if(voucherId != undefined){
+                let voucherServices = new VoucherServices()
+                let voucher = await voucherServices.getVoucherById(voucherId!!)
+                if(voucher == null){
+                    throw new Error('unable to find voucher')
+                }
+                let afterOfferPrice = priceBeforeTax.multipliedBy(BigNumber(voucher.offerPercent).dividedBy(100)).dp(2)
+                order.voucher = voucher
+                order.orderDetails = orderDetailsList
+                order.afterOfferPrice = afterOfferPrice.toString()
+                order.beforeTaxPrice = priceBeforeTax.toString()
+                order.taxPrice = afterOfferPrice.multipliedBy('0.13').dp(2).toString()
+                order.totalPrice = afterOfferPrice.plus(order.taxPrice.toString()).toString()
+                order.paid = false
+                order.status = OrderStatus.pending
+            }else{
+                order.orderDetails = orderDetailsList
+                order.beforeTaxPrice = priceBeforeTax.toString()
+                order.taxPrice = priceBeforeTax.multipliedBy('0.13').dp(2).toString()
+                order.totalPrice = priceBeforeTax.plus(order.taxPrice.toString()).toString()
+                order.paid = false
+                order.status = OrderStatus.pending
+            }
 
+            
+            
             let orderRepo = rallyDataSource.getRepository(Orders)
             let result = await orderRepo.save(order)
 
@@ -79,7 +103,7 @@ export class OrderServices{
                 where: {
                     id: Equal(orderId)
                 },
-                relations: ['user', 'orderDetails', 'orderDetails.menu']
+                relations: ['user', 'orderDetails', 'orderDetails.menu', 'voucher']
             })
             callback(null, result)
         }catch(error){
@@ -248,6 +272,24 @@ export class OrderServices{
         } 
     }
 
+    public updateDate = async(
+        orderId: number,
+        date: Date
+    ) => {
+        try{
+            let rallyDataSource = await getDataSource()
+            let orderRepo = rallyDataSource.getRepository(Orders)
+            const result = await orderRepo.update(
+                { id: orderId}, 
+                { orderPlacedDate: date}
+            )
+        }catch(error){
+            console.log(error)
+            throw error
+        } 
+    }
+
+
     public updateStatus = async (
         orderId: number,
         status: OrderStatus,
@@ -311,7 +353,7 @@ export class OrderServices{
                 }
             })
             if(result == null){
-                throw new Error('no orderId')
+                return []
             }
             return result.associatedCarts!
         }catch(error){
@@ -324,6 +366,7 @@ export class OrderServices{
         orderId: number,
     ) => {
         try{
+            console.log(orderId)
             let rallyDataSource = await getDataSource()
             let orderCartRepo = rallyDataSource.getRepository(OrderCart)
             const result = await orderCartRepo.delete({associatedOrder: Equal(orderId)})
@@ -338,6 +381,7 @@ export class OrderServices{
     ) => {
         try{
             console.log('OrderServices -> deleteOrderAssociatedCarts')
+            console.log(orderId)
             const carts = await this.findToOrderCartAssociation(orderId)
             console.log(carts)
             await this.deleteOrderCart(orderId)

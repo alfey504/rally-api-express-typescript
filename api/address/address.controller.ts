@@ -62,6 +62,16 @@ export class AddressController{
             res.status(400).json(response)
             return
         } 
+
+        if (req.body.city == undefined) {
+            let response = {
+                success: 0,
+                message: 'Request missing parameter {city:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        } 
         
         if (req.body.postalCode == undefined) {
             let response = {
@@ -79,6 +89,7 @@ export class AddressController{
             req.body.line1,
             req.body.line2,
             req.body.country,
+            req.body.city,
             req.body.province,
             req.body.postalCode,
         )

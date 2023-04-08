@@ -12,6 +12,7 @@ import { Orders } from './entity/order'
 import { OrderDetails } from './entity/order_details'
 import { OrderCart } from './entity/order_cart'
 import { env_type } from '..'
+import { Voucher } from './entity/voucher'
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env')})
 
@@ -22,7 +23,7 @@ const rallyDataSource = new DataSource({
     username: process.env.TEST_DB_USERNAME,
     password: process.env.TEST_DB_PASSWORD,
     database: process.env.DB_NAME,
-    entities: [User, Category, Menu, Token, Cart, Address, Orders, OrderDetails, OrderCart]
+    entities: [User, Category, Menu, Token, Cart, Address, Orders, OrderDetails, OrderCart, Voucher]
 })
 
 rallyDataSource

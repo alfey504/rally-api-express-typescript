@@ -10,13 +10,16 @@ import { Address } from './address'
 
 import { OrderDetails } from './order_details'
 import { User } from './users'
+import { type } from 'os'
+import { Voucher } from './voucher'
+import { join } from 'path'
 
 @Entity()
 export class Orders {
     @PrimaryGeneratedColumn()
     id?: number
 
-    @ManyToOne((type) => User)
+    @ManyToOne((type) => User, {nullable: false})
     @JoinColumn()
     user!: User
 
@@ -44,4 +47,14 @@ export class Orders {
 
     @Column( {nullable: false })
     status!: String
+
+    @Column( {nullable: true} )
+    orderPlacedDate?: Date
+
+    @ManyToOne((type) => Voucher, {nullable: true})
+    @JoinColumn()
+    voucher?: Voucher | number
+
+    @Column( {nullable: true})
+    afterOfferPrice?: String
 }
