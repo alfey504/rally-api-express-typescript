@@ -9,6 +9,7 @@ import { User } from '../../database/entity/users'
 import { CartServices } from '../cart/cart.services'
 import { VoucherServices } from '../voucher/voucher.services'
 import { Voucher } from '../../database/entity/voucher'
+import { CartSockets } from '../cart/cart.socket'
 
 export enum OrderStatus{
     pending = 'pending',
@@ -72,8 +73,6 @@ export class OrderServices{
                 order.paid = false
                 order.status = OrderStatus.pending
             }
-
-            
             
             let orderRepo = rallyDataSource.getRepository(Orders)
             let result = await orderRepo.save(order)
@@ -348,9 +347,7 @@ export class OrderServices{
                 where: {
                     associatedOrder: Equal(orderId)
                 },
-                relations: {
-                    associatedCarts: true
-                }
+                relations: ['associatedCarts' , 'associatedCarts.user']
             })
             if(result == null){
                 return []
@@ -387,11 +384,14 @@ export class OrderServices{
             await this.deleteOrderCart(orderId)
             let rallyDataSource = await getDataSource()
             let cartService = new CartServices()
+            let cartSockets = new CartSockets()
+            console.log(carts)
             carts.forEach((cart)=> {
                 cartService.deleteFromCart(cart.id!, (err?: any, result?: any)=>{
                     if(err){
                         throw err
                     }
+                    cartSockets.notifyCartDelete(cart)
                 })
             })
             await this.deleteOrderCart(orderId)
