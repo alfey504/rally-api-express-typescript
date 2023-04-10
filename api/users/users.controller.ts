@@ -173,6 +173,7 @@ export class UserController {
                         data: []
                     }
                     res.status(500).json(response)
+                    return
                 }
 
                 if (!result) {
