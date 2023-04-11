@@ -8,6 +8,9 @@ import BigNumber from 'bignumber.js'
 import { OrderSockets } from './order.socket'
 import { OrderDetails } from '../../database/entity/order_details'
 import { OneToMany } from 'typeorm'
+import { VoucherServices } from '../voucher/voucher.services'
+import { Voucher } from '../../database/entity/voucher'
+import { get } from 'http'
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env')})
 
@@ -21,10 +24,12 @@ export class  OrderController{
 
     orderServices: OrderServices
     orderSocket: OrderSockets
+    voucherServices: VoucherServices
 
     constructor(){
         this.orderServices = new OrderServices()
         this.orderSocket = new OrderSockets()
+        this.voucherServices = new VoucherServices()
     }
 
     public makeOrderFromCart = async (req : Request, res: Response) => {
@@ -179,20 +184,13 @@ export class  OrderController{
     }
 
     public makePaymentIntent = async (req: Request, res: Response) => {
+
+        let orderMethod: String
+
         if(req.body.orderId == undefined){
             let response = {
                 success: 0,
                 message: 'missing parameter {orderId:}',
-                data: []
-            }
-            res.status(400).json(response)
-            return
-        }
-
-        if(req.body.addressId  == undefined){
-            let response = {
-                success: 0,
-                message: 'missing parameter {addressId:}',
                 data: []
             }
             res.status(400).json(response)
@@ -247,8 +245,16 @@ export class  OrderController{
                     },
                 })
 
+
+                if(req.body.addressId  == undefined){
+                    orderMethod = 'pickup'
+                }else{
+                    orderMethod = 'delivery'
+                    this.orderServices.updateAddress(order.id!, +req.body.addressId)
+                    this.orderServices.updateOrderMethod(order.id!, orderMethod)
+                }
+
                 this.orderServices.updateOrderPaymentIntent(order.id!, paymentIntent.id)
-                this.orderServices.updateAddress(order.id!, +req.body.addressId)
 
                 let response = {
                     success: 1,
@@ -290,6 +296,20 @@ export class  OrderController{
             await this.orderServices.updateDate(+req.body.orderId, new Date())
             await this.orderServices.deleteOrderAssociatedCarts(+req.body.orderId)
             
+            await this.orderServices.findOrderById(+req.body.orderId,(err?: any, order?: Orders| null) => {
+                if(err || order == null || order == undefined){
+                    throw new Error('Failed to find order: Database Error')
+                }
+                if(order.voucher != null || order.voucher != undefined){
+                    try{
+                        let voucher = order.voucher as Voucher
+                        this.voucherServices.addUserClaimedVoucher(voucher.id, order.user)
+                    }catch(error){
+                        throw error
+                    }
+                }
+            })
+
             let response = {
                 success: 1,
                 message: 'successfully updated order',
@@ -473,4 +493,139 @@ export class  OrderController{
             })
         })
     }
+
+    public applyVoucherToOrder =  async (req: Request, res: Response) => {
+        if(req.body.orderId == undefined){
+            let response = {
+                success: 0,
+                message: 'missing parameter {orderId:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+
+        if(req.body.voucherCode == undefined){
+            let response = {
+                success: 0,
+                message: 'missing parameter {voucherCode:}',
+                data: []
+            }
+            res.status(400).json(response)
+            return
+        }
+            
+        this.voucherServices.getVoucherByCode(
+            req.body.voucherCode,
+            (err?: any, voucher?: Voucher | null) => {
+
+            if(err){
+                console.log(err)
+                let response = {
+                    success: 0,
+                    message: 'failed to find voucher: Database Error',
+                    data: []
+                }
+                res.status(500).json(response)
+                return
+            }
+
+            if(voucher == null){
+                console.log(err)
+                let response = {
+                    success: 0,
+                    message: 'unable to find the voucher',
+                    data: []
+                }
+                res.status(400).json(response)
+                return
+            }
+
+            this.orderServices.findOrderById(
+                +req.body.orderId,
+                (err?: any, order?: Orders| null) =>{
+                    
+                    if(err){
+                        console.log(err)
+                        let response = {
+                            success: 0,
+                            message: 'failed to find Order: Database Error',
+                            data: []
+                        }
+                        res.status(500).json(response)
+                        return
+                    }
+                    if(order == null){
+                        console.log(err)
+                        let response = {
+                            success: 0,
+                            message: 'Unable to find order',
+                            data: []
+                        }
+                        res.status(400).json(response)
+                        return
+                    }
+                    
+                    let flag = false
+                    voucher.claimedUsers?.forEach((user) => {
+                        if(order.user.id == user.id){
+                            flag = true
+                        }
+                    })
+
+                    if(flag){
+                        console.log(err)
+                        let response = {
+                            success: 0,
+                            message: 'Voucher already claimed',
+                            data: []
+                        }
+                        res.status(409).json(response)
+                        return
+                    }
+
+                    order.voucher = voucher
+                    let OfferPrice = BigNumber(order.beforeTaxPrice.toString())
+                        .multipliedBy(
+                            BigNumber(voucher.offerPercent.toString())
+                            .dividedBy(100)
+                            .dp(2)
+                        )
+                    console.log(OfferPrice.toString())
+
+                    order.afterOfferPrice =  BigNumber(order.beforeTaxPrice.toString())
+                        .minus(OfferPrice).toString()
+
+                    order.taxPrice = BigNumber(order.afterOfferPrice.toString())
+                        .multipliedBy('0.13').toString()
+
+                    order.totalPrice = BigNumber(order.afterOfferPrice.toString())
+                        .plus(order.taxPrice.toString()).toString()
+                    
+                    this.orderServices.saveOrder(order, (err?: any, order?: Orders) => {
+                        if(err){
+                            console.log(err)
+                            let response = {
+                                success: 0,
+                                message: 'Failed to update order: Database Error',
+                                data: []
+                            }
+                            res.status(500).json(response)
+                            return
+                        }
+                    })
+
+                    let response = {
+                        success: 1,
+                        message: 'voucher applied successfully',
+                        data: [order]
+                    }
+                    res.json(response)
+                    return
+            })
+
+        })
+
+    }
+
 }

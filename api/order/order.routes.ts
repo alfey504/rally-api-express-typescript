@@ -13,6 +13,7 @@ orderRouter.post('/makepayment/', AuthorizationController.verifyToken, orderCont
 orderRouter.post('/placeorder', AuthorizationController.verifyToken, orderController.placeOrder)
 orderRouter.delete('/:orderId', AuthorizationController.verifyToken, orderController.deleteOrderById)
 orderRouter.post('/reorder', AuthorizationController.verifyToken, orderController.reorderOrderById)
+orderRouter.patch('/voucher', AuthorizationController.verifyToken, orderController.applyVoucherToOrder)
 
 // admin
 orderRouter.get('/status/:status', AuthorizationController.verifyToken, orderController.getOrderByStatus)

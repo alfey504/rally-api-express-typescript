@@ -57,4 +57,7 @@ export class Orders {
 
     @Column( {nullable: true})
     afterOfferPrice?: String
+
+    @Column( {default: 'pickup'})
+    orderMethod!: String
 }

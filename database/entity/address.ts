@@ -3,7 +3,9 @@ import {
     Column,
     PrimaryGeneratedColumn,
     ManyToOne,
-    JoinColumn
+    JoinColumn,
+    CreateDateColumn,
+    DeleteDateColumn
 } from 'typeorm'
 import { User } from './users'
 
@@ -37,6 +39,12 @@ export class Address {
 
     @Column({ nullable: false })
     postalCode!: String
+
+    @CreateDateColumn()
+    createdDate!: Date
+
+    @DeleteDateColumn()
+    deletedDate!: Date
 
     constructor(
         userId: any, 

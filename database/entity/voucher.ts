@@ -11,7 +11,7 @@ export class Voucher{
 
     @ManyToMany((type) => User, { onDelete: 'CASCADE'})
     @JoinTable()
-    claimedUsers?: number[] | User[]
+    claimedUsers?: User[]
 
     @Column()
     expiration?: Date

@@ -15,7 +15,7 @@ export class VoucherServices{
             const result = await rallyRepo.find({
                 relations: {
                     claimedUsers: true
-                }
+                },
             })
             let filteredResult: Voucher[] = [] 
             result.forEach((voucher, i)=>{
@@ -31,7 +31,6 @@ export class VoucherServices{
 
                     if(id == userId){
                         flag = true
-                        stop
                     }
                 })
                 if(!flag){
@@ -83,14 +82,17 @@ export class VoucherServices{
 
     public getVoucherByCode = async (
         voucherCode: String,
-        callback: (err?: any, result?: any) => void
+        callback: (err?: any, result?: Voucher | null) => void
     ) => {
         try {
             const rallyDataSource = getDataSource()
             const rallyRepo = (await rallyDataSource).getRepository(Voucher)
-            const result = await rallyRepo.find({
+            const result = await rallyRepo.findOne({
                 where: {
                     code: Equal(voucherCode)
+                },
+                relations: {
+                    claimedUsers: true
                 }
             })
             callback(null, result)
@@ -109,6 +111,26 @@ export class VoucherServices{
             return result
         } catch (error) {
             throw error
+        }
+    }
+
+    public addUserClaimedVoucher = async(
+        voucherId: number,
+        user: User,
+    ) => {
+        try{
+            const rallyDataSource = getDataSource()
+            const rallyRepo = (await rallyDataSource).getRepository(Voucher)
+            const voucher = await rallyRepo.findOne({where: {id: Equal(voucherId)}})
+            if(voucher == null){
+                throw Error('cannot find voucher')
+            }
+            voucher.claimedUsers = voucher.claimedUsers || []
+            voucher.claimedUsers.push(user)
+            let result = await rallyRepo.save(voucher)
+            console.log(result)
+        }catch(err){
+            throw err
         }
     }
 } 

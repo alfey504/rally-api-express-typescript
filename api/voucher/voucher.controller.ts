@@ -130,12 +130,21 @@ export class VoucherController{
 
         await this.voucherServices.getVoucherByCode(
             req.params.voucherCode, 
-            (err: any, result?: Voucher) => {
-
+            (err: any, result?: Voucher | null) => {
             if (err) {
                 let response = {
                     success: 0,
                     message: 'Failed to fetch voucher: Database Error',
+                    data: []
+                }
+                res.status(500).json(response)
+                return
+            }
+
+            if(result == null){
+                let response = {
+                    success: 0,
+                    message: 'Failed to fetch voucher: No such voucher',
                     data: []
                 }
                 res.status(500).json(response)

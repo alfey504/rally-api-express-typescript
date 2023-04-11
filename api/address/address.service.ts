@@ -47,7 +47,7 @@ export class AddressService{
         try {
             const rallyDataSource = getDataSource()
             const rallyRepo = (await rallyDataSource).getRepository(Address)
-            const result = await rallyRepo.delete({
+            const result = await rallyRepo.softDelete({
                 id: addressId
             })
             callback(null, result)

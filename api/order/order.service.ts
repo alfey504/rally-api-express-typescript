@@ -56,7 +56,8 @@ export class OrderServices{
                 if(voucher == null){
                     throw new Error('unable to find voucher')
                 }
-                let afterOfferPrice = priceBeforeTax.multipliedBy(BigNumber(voucher.offerPercent).dividedBy(100)).dp(2)
+                let offerPrice = priceBeforeTax.multipliedBy(BigNumber(voucher.offerPercent).dividedBy(100)).dp(2)
+                let afterOfferPrice = priceBeforeTax.minus(offerPrice)
                 order.voucher = voucher
                 order.orderDetails = orderDetailsList
                 order.afterOfferPrice = afterOfferPrice.toString()
@@ -144,7 +145,7 @@ export class OrderServices{
                     user: Equal(userId),
                     paid: Equal(true)
                 },
-                relations: ['user', 'orderDetails', 'orderDetails.menu','address']
+                relations: ['user', 'orderDetails', 'orderDetails.menu','address', 'voucher']
             })
             callback(null, result)
         }catch(error){
@@ -247,6 +248,23 @@ export class OrderServices{
             const result = await orderRepo.update(
                 { id: orderId}, 
                 { address: addressId }
+            )
+        }catch(error){
+            console.log(error)
+            throw error
+        } 
+    }
+
+    public updateOrderMethod = async (
+        orderId: number,
+        orderMethod: String
+    ) => {
+        try{
+            let rallyDataSource = await getDataSource()
+            let orderRepo = rallyDataSource.getRepository(Orders)
+            const result = await orderRepo.update(
+                { id: orderId}, 
+                { orderMethod: orderMethod }
             )
         }catch(error){
             console.log(error)
@@ -437,6 +455,19 @@ export class OrderServices{
         }catch(error){
             console.log(error)
             callback(error)
+        }
+    }
+
+    public updateVoucherOnOrder = async (
+        orderId: number,
+        voucher: Voucher
+    ) =>  {
+        try{
+            let rallyDataSource = await getDataSource()
+            let orderRepo = rallyDataSource.getRepository(Orders)
+            const result = await orderRepo.update({id: orderId}, {voucher: voucher})    
+        }catch(error){
+            throw error
         }
     }
 
