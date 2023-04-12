@@ -693,7 +693,7 @@ export class UserController {
             userId = +req.body.userId,
             req.body.userName,
             req.body.fullName,
-            req.body.fullName,
+            req.body.email,
             password,
             (err?: any, result?: any) => {
                 if (err) {
