@@ -44,8 +44,8 @@ export class OrderServices{
                 let orderDetail = new OrderDetails()
                 orderDetail.menu = cart.menu
                 orderDetail.quantity = cart.quantity
-                orderDetail.price = cart.price
-                priceBeforeTax = priceBeforeTax.plus(cart.price)
+                orderDetail.price = BigNumber(cart.menu.price).multipliedBy(cart.quantity).toString()
+                priceBeforeTax = priceBeforeTax.plus(orderDetail.price.toString())
                 orderDetailsList.push(orderDetail)
             })
 
