@@ -441,8 +441,9 @@ export class  OrderController{
                 let orderDetail = new OrderDetails()
                 orderDetail.menu = orderItem.menu
                 orderDetail.quantity = orderItem.quantity
-                orderDetail.price = orderItem.price
-                priceBeforeTax = priceBeforeTax.plus(BigNumber(orderItem.price.toString()))
+                orderDetail.price = BigNumber(orderItem.menu.price)
+                    .multipliedBy(orderItem.quantity).toString()
+                priceBeforeTax = priceBeforeTax.plus(BigNumber(orderDetail.price.toString()))
                 orderDetailsList.push(orderDetail)
             })
 
